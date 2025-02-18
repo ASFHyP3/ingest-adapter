@@ -1,13 +1,12 @@
 AWSTemplateFormatVersion: 2010-09-09
 
-Parameters:
-  TODO
-
 Resources:
-  SnsPublishTopic:
+  PublishTopic:
     Type: AWS::SNS::Topic
     Properties:
-      TODO
+      Subscription:
+        - Endpoint: !GetAtt Queue.Arn
+          Protocol: sqs
 
   SnsIAMPolicy:
     Type: AWS::SNS::TopicPolicy
@@ -15,9 +14,17 @@ Resources:
       PolicyDocument:
         Version: 2012-10-17
         Statement:
-          TODO
+          - Sid: AllowServices
+            Effect: Allow
+            Principal:
+              Service:
+                - events.amazonaws.com
+                - cloudwatch.amazonaws.com
+            Action: 'sns:Publish'
+            Resource:
+              - !Ref PublishTopic
       Topics:
-        - !Ref SnsPublishTopic
+        - !Ref PublishTopic
 
   DeadLetterQueue:
     Type: AWS::SQS::Queue
@@ -46,56 +53,6 @@ Resources:
             Resource: !GetAtt Queue.Arn
             Condition:
               ArnEquals:
-                aws:SourceArn: [!Ref PublishSubscription]
+                aws:SourceArn: [!Ref PublishTopic]
       Queues:
         - !Ref Queue
-
-  PublishSubscription:
-    Type: AWS::SNS::Subscription
-    Properties:
-      TopicArn: !GetAtt SnsPublishTopic.Arn
-      Protocol: sqs
-      Endpoint: !GetAtt Queue.Arn
-      FilterPolicyScope: MessageBody
-      FilterPolicy:
-        TODO
-
-  Secrets:
-    Type: AWS::SecretsManager::Secret
-    Properties:
-      TODO
-
-  Lambda:
-    Type: AWS::Lambda::Function
-    Properties:
-      Code: TODO
-      Handler: TODO
-      MemorySize: 128
-      Role: !GetAtt LambdaRole.Arn
-      Runtime: python3.12
-      Timeout: 900
-      Environment:
-        Variables:
-          TODO
-
-  LambdaEventSourceMapping:
-    Type: AWS::Lambda::EventSourceMapping
-    Properties:
-      FunctionName: !Ref Lambda
-      BatchSize: 1
-      EventSourceArn: !GetAtt Queue.Arn
-      FunctionResponseTypes:
-        - ReportBatchItemFailures
-      ScalingConfig:
-        MaximumConcurrency: 100
-
-  LambdaLogGroup:
-    Type: AWS::Logs::LogGroup
-    Properties:
-      LogGroupName: !Sub "/aws/lambda/${Lambda}"
-      RetentionInDays: 90
-
-  LambdaRole:
-    Type: AWS::IAM::Role
-    Properties:
-      TODO
