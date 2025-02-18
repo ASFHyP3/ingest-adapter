@@ -1,0 +1,6 @@
+-r apps/publish-app/requirements.txt
+-r apps/publish-container/requirements.txt
+mypy==1.15.0
+ruff==0.9.6
+pytest==8.3.4
+pytest-cov==6.0.0
