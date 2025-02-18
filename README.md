@@ -55,3 +55,7 @@ To use the app directly to publish a job run
 ```
 ingest_adapter https://hyp3-api.asf.alaska.edu (job_id)
 ```
+
+## Deployment
+
+TODO
