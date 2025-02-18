@@ -39,7 +39,7 @@ def test_exists_in_cmr():
                     },
                 },
             ],
-        }
+        },
     )
     granule_ur = 'S1-GUNW-D-R-036-tops-20250131_20241226-041630-00025E_00035N-PP-99eb-v3_0_1'
     assert publish_app.exists_in_cmr('cmr.earthdata.nasa.gov', granule_ur)
@@ -59,7 +59,7 @@ def test_exists_in_cmr():
         ],
         json={
             'items': [],
-        }
+        },
     )
     granule_ur = 'S1-GUNW-D-R-123-tops-20230605_20230512-032645-00038E_00036N-PP-f518-v3_0_0'
     assert not publish_app.exists_in_cmr('cmr.uat.earthdata.nasa.gov', granule_ur)
@@ -75,7 +75,6 @@ def test_generate_ingest_message(monkeypatch):
                 },
             },
         ],
-
     }
     expected = {
         'ProductName': 'myFilename',
@@ -99,3 +98,15 @@ def test_generate_ingest_message(monkeypatch):
     mock_datetime.now.return_value = now
     monkeypatch.setattr(datetime, 'datetime', mock_datetime)
     assert publish_app.generate_ingest_message(job) == expected
+
+
+def test_publish_mesage():
+    assert False
+
+
+def test_process_message():
+    assert False
+
+
+def test_lambda_handler():
+    assert False
