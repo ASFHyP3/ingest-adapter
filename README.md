@@ -13,9 +13,9 @@ An application for publishing HyP3 output products for ingest into ASF's data ca
 To run all commands in sequence use:
 ```bash
 git clone https://github.com/ASFHyP3/ingest-adapter.git
-cd ingest-adapter
+cd app
 mamba env create -f environment.yml
-mamba activate ingest-adapter
+mamba activate ingest-adapter-app
 python -m pip install -e .
 ```
 
@@ -24,15 +24,15 @@ python -m pip install -e .
 To install the container run the following commands in the root of the repository
 
 ```bash
-cd container?
+cd container
 mamba env create -f environment.yml
-mamba activate container?
+mamba activate ingest-adapter-container
 python -m pip install -e .
 ```
 
 ## Usage
 
-To allow for a HyP3 job to publish it's outputs, use the ingest-adapter container plugin and add it as a step to the job_spec file
+To allow for a HyP3 job to publish it's outputs, use the ingest-adapter container and add it as a step to the job_spec file
 that looks like this:
 
 ```
@@ -50,7 +50,7 @@ that looks like this:
         - HYP3_API_URL
 ```
 
-To use the plugin directly to publish a job
+To use the app directly to publish a job run
 
 ```
 ingest_adapter https://hyp3-api.asf.alaska.edu (job_id)
