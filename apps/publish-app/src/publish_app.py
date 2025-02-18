@@ -1,4 +1,3 @@
-
 import datetime
 import json
 import os
@@ -7,7 +6,6 @@ import pathlib
 import boto3
 import hyp3_sdk
 import requests
-
 
 
 def get_granule_ur_pattern(granule_ur: str) -> str:
@@ -53,7 +51,7 @@ def generate_ingest_message(hyp3_job_dict: dict) -> dict:
 
 
 def publish_message(message: dict, topic_arn: str):
-    print(f'Publishing {message['ProductName']} to {topic_arn}')
+    print(f'Publishing {message["ProductName"]} to {topic_arn}')
     topic_region = topic_arn.split(':')[3]
     sns = boto3.client(topic_arn, region=topic_region)
     sns.publish(
@@ -63,7 +61,9 @@ def publish_message(message: dict, topic_arn: str):
 
 
 def process_message(message: dict):
-    hyp3 = hyp3_sdk.HyP3(url=message['hyp3_url'], username=os.environ['EDL_USERNAME'], password=os.environ['EDL_PASSWORD'])
+    hyp3 = hyp3_sdk.HyP3(
+        api_url=message['hyp3_url'], username=os.environ['EDL_USERNAME'], password=os.environ['EDL_PASSWORD']
+    )
     job = hyp3.get_job_by_id(message['job_id'])
     ingest_message = generate_ingest_message(job.to_dict())
     if exists_in_cmr(ingest_message['ProductName'], os.environ['CMR_DOMAIN']):
