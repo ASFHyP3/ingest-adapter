@@ -1,6 +1,7 @@
 import datetime
 from unittest.mock import MagicMock, call, patch
 
+import hyp3_sdk
 import responses
 
 import publish_app
@@ -127,8 +128,50 @@ def test_publish_message():
         )
 
 
-def test_process_message():
-    assert False
+def test_get_job_dict():
+    job = hyp3_sdk.jobs.Job(
+        job_type='myJobType',
+        job_id='abc123',
+        request_time=datetime.datetime(2025, 2, 19, 1, 2, 3, 456),
+        status_code='SUCCEEDED',
+        user_id='myUser',
+    )
+
+    with patch('hyp3_sdk.HyP3') as mock_constructor:
+        mock_hyp3 = MagicMock()
+        mock_hyp3.get_job_by_id.return_value = job
+        mock_constructor.return_value = mock_hyp3
+
+        job_dict = publish_app.get_job_dict('https://foo.com', 'myUser', 'myPass', 'abc123')
+
+        assert job_dict == {
+            'job_type': 'myJobType',
+            'job_id': 'abc123',
+            'request_time': '2025-02-19T01:02:03',
+            'status_code': 'SUCCEEDED',
+            'user_id': 'myUser',
+        }
+        mock_constructor.assert_called_once_with('https://foo.com', 'myUser', 'myPass')
+        mock_hyp3.get_job_by_id.assert_called_once_with('abc123')
+
+
+def test_process_message(monkeypatch):
+    monkeypatch.setenv('EDL_USERNAME', 'myUser')
+    monkeypatch.setenv('EDL_PASSWORD', 'myPassword')
+    monkeypatch.setenv('CMR_DOMAIN', 'cmr.earthdata.nasa.gov')
+    monkeypatch.setenv('TOPIC_ARN', 'myTopicArn')
+
+    with (patch('publish_app.get_job_dict', return_value={'a', 'b'}) as get_job_dict,
+          patch('publish_app.generate_ingest_message', return_value={'ProductName': 'foo'}) as generate_ingest_message,
+          patch('publish_app.exists_in_cmr', return_value=False) as exists_in_cmr,
+          patch('publish_app.publish_message') as publish_message):
+
+        publish_app.process_message({'hyp3_url': 'https://foo.com', 'job_id': 'abc123'})
+
+        get_job_dict.assert_called_once_with('https://foo.com', 'myUser', 'myPassword', 'abc123')
+        generate_ingest_message.assert_called_once_with({'a', 'b'})
+        exists_in_cmr.assert_called_once_with('foo', 'cmr.earthdata.nasa.gov')
+        publish_message.assert_called_once_with({'ProductName': 'foo'}, 'myTopicArn')
 
 
 def test_lambda_handler():

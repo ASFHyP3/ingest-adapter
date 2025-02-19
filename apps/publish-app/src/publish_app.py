@@ -50,7 +50,7 @@ def generate_ingest_message(hyp3_job_dict: dict) -> dict:
     }
 
 
-def publish_message(message: dict, topic_arn: str):
+def publish_message(message: dict, topic_arn: str) -> None:
     print(f'Publishing {message["ProductName"]} to {topic_arn}')
     topic_region = topic_arn.split(':')[3]
     sns = boto3.client('sns', region_name=topic_region)
@@ -60,14 +60,17 @@ def publish_message(message: dict, topic_arn: str):
     )
 
 
-def process_message(message: dict):
-    hyp3 = hyp3_sdk.HyP3(
-        api_url=message['hyp3_url'], username=os.environ['EDL_USERNAME'], password=os.environ['EDL_PASSWORD']
-    )
-    job = hyp3.get_job_by_id(message['job_id'])
-    ingest_message = generate_ingest_message(job.to_dict())
-    if exists_in_cmr(ingest_message['ProductName'], os.environ['CMR_DOMAIN']):
-        publish_message(message, os.environ['TOPIC_ARC'])
+def get_job_dict(hyp3_url: str, username: str, password: str, job_id: str) -> dict:
+    hyp3 = hyp3_sdk.HyP3(hyp3_url, username, password)
+    job = hyp3.get_job_by_id(job_id)
+    return job.to_dict()
+
+
+def process_message(message: dict) -> None:
+    job = get_job_dict(message['hyp3_url'], os.environ['EDL_USERNAME'], os.environ['EDL_PASSWORD'], message['job_id'])
+    ingest_message = generate_ingest_message(job)
+    if not exists_in_cmr(ingest_message['ProductName'], os.environ['CMR_DOMAIN']):
+        publish_message(ingest_message, os.environ['TOPIC_ARN'])
 
 
 def lambda_handler(event: dict, context: object) -> dict:
