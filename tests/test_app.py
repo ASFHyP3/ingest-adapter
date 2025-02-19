@@ -172,7 +172,7 @@ def test_process_message(monkeypatch):
 
         get_job_dict.assert_called_once_with('https://foo.com', 'myUser', 'myPassword', 'abc123')
         generate_ingest_message.assert_called_once_with({'job_type': 'ARIA_S1_GUNW'})
-        exists_in_cmr.assert_called_once_with('foo', 'cmr.earthdata.nasa.gov')
+        exists_in_cmr.assert_called_once_with('cmr.earthdata.nasa.gov', 'foo')
         publish_message.assert_called_once_with({'ProductName': 'foo'}, 'myTopicArn')
 
     with (
@@ -185,7 +185,7 @@ def test_process_message(monkeypatch):
 
         get_job_dict.assert_called_once_with('https://bar.com', 'myUser', 'myPassword', 'def456')
         generate_ingest_message.assert_called_once_with({'job_type': 'ARIA_S1_GUNW'})
-        exists_in_cmr.assert_called_once_with('bar', 'cmr.earthdata.nasa.gov')
+        exists_in_cmr.assert_called_once_with('cmr.earthdata.nasa.gov', 'bar')
         publish_message.assert_not_called()
 
     with (
