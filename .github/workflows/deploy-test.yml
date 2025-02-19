@@ -26,4 +26,4 @@ jobs:
           HYP3_ACCOUNT_IDS: ${{ secrets.HYP3_ACCOUNT_IDS }}
           CMR_DOMAIN: cmr.uat.earthdata.nasa.gov
           TEMPLATE_BUCKET: cf-templates-118ylv0o6jp2n-us-west-2
-          APP_STACK_NAME: ingets-adapater-test
+          APP_STACK_NAME: ingest-adapater-test
