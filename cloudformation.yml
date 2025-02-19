@@ -14,6 +14,12 @@ Parameters:
     Type: String
     NoEcho: true
 
+  CmrDomain:
+    Type: String
+    AllowedValues:
+      - cmr.earthdata.nasa.gov
+      - cmr.uat.earthdata.nasa.gov
+
 Resources:
   PublishTopic:
     Type: AWS::SNS::Topic
@@ -79,6 +85,8 @@ Resources:
       Environment:
         Variables:
           SECRET_ARN: !Ref EDLSecret
+          INGEST_TOPIC_ARN: !Ref IngestTopicArn
+          CMR_DOMAIN: !Ref CmrDomain
 
   EDLSecret:
     Type: AWS::SecretsManager::Secret

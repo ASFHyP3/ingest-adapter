@@ -18,6 +18,8 @@ inputs:
     required: true
   EARTHDATA_PASSWORD:
     required: true
+  CMR_DOMAIN:
+    required: true
 
 runs:
   using: composite
@@ -53,4 +55,5 @@ runs:
               IngestTopicArn='${{ inputs.INGEST_TOPIC_ARN }}'\
               Hyp3AccountIds='${{ inputs.HYP3_ACCOUNT_IDS }}' \
               EarthdataUsername='${{ inputs.EARTHDATA_USERNAME }}' \
-              EarthdataPassword='${{ inputs.EARTHDATA_PASSWORD }}'
+              EarthdataPassword='${{ inputs.EARTHDATA_PASSWORD }}' \
+              CmrDomain='${{ inputs.CMR_DOMAIN }}'

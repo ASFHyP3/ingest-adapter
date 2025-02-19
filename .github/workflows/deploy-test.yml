@@ -24,5 +24,6 @@ jobs:
           EARTHDATA_PASSWORD: ${{ secrets.EARTHDATA_PASSWORD }}
           INGEST_TOPIC_ARN: ${{ INGEST_TOPIC_ARN }}
           HYP3_ACCOUNT_IDS: ${{ secrets.HYP3_ACCOUNT_IDS }}
+          CMR_DOMAIN: cmr.uat.earthdata.nasa.gov
           TEMPLATE_BUCKET: cf-templates-118ylv0o6jp2n-us-west-2
           APP_STACK_NAME: ingets-adapater-test
