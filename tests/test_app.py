@@ -4,17 +4,17 @@ from unittest.mock import MagicMock, call, patch
 import hyp3_sdk
 import responses
 
-import publish_app
+import app
 
 
 def test_get_granule_ur_pattern():
     granule_ur = 'S1-GUNW-D-R-036-tops-20250131_20241226-041630-00025E_00035N-PP-99eb-v3_0_1'
     expected = 'S1-GUNW-D-R-036-tops-20250131_20241226-041630-00025E_00035N-PP-99eb-*'
-    assert publish_app.get_granule_ur_pattern(granule_ur) == expected
+    assert app.get_granule_ur_pattern(granule_ur) == expected
 
     granule_ur = 'S1-GUNW-D-R-123-tops-20230605_20230512-032645-00038E_00036N-PP-f518-v3_0_0'
     expected = 'S1-GUNW-D-R-123-tops-20230605_20230512-032645-00038E_00036N-PP-f518-*'
-    assert publish_app.get_granule_ur_pattern(granule_ur) == expected
+    assert app.get_granule_ur_pattern(granule_ur) == expected
 
 
 @responses.activate
@@ -43,7 +43,7 @@ def test_exists_in_cmr():
         },
     )
     granule_ur = 'S1-GUNW-D-R-036-tops-20250131_20241226-041630-00025E_00035N-PP-99eb-v3_0_1'
-    assert publish_app.exists_in_cmr('cmr.earthdata.nasa.gov', granule_ur)
+    assert app.exists_in_cmr('cmr.earthdata.nasa.gov', granule_ur)
 
     responses.get(
         'https://cmr.uat.earthdata.nasa.gov/search/granules.umm_json',
@@ -63,7 +63,7 @@ def test_exists_in_cmr():
         },
     )
     granule_ur = 'S1-GUNW-D-R-123-tops-20230605_20230512-032645-00038E_00036N-PP-f518-v3_0_0'
-    assert not publish_app.exists_in_cmr('cmr.uat.earthdata.nasa.gov', granule_ur)
+    assert not app.exists_in_cmr('cmr.uat.earthdata.nasa.gov', granule_ur)
 
 
 def test_generate_ingest_message(monkeypatch):
@@ -99,7 +99,7 @@ def test_generate_ingest_message(monkeypatch):
     mock_datetime.now.return_value = now
     monkeypatch.setattr(datetime, 'datetime', mock_datetime)
 
-    assert publish_app.generate_ingest_message(job) == expected
+    assert app.generate_ingest_message(job) == expected
 
 
 def test_publish_message():
@@ -107,7 +107,7 @@ def test_publish_message():
         mock_sns = MagicMock()
         mock_client.return_value = mock_sns
 
-        publish_app.publish_message({'ProductName': 'foo'}, 'arn:aws:sns:us-east-1:123456789012:myTopic')
+        app.publish_message({'ProductName': 'foo'}, 'arn:aws:sns:us-east-1:123456789012:myTopic')
 
         mock_client.assert_called_once_with('sns', region_name='us-east-1')
         mock_sns.publish.assert_called_once_with(
@@ -119,7 +119,7 @@ def test_publish_message():
         mock_sns = MagicMock()
         mock_client.return_value = mock_sns
 
-        publish_app.publish_message({'ProductName': 'bar'}, 'arn:aws:sns:us-west-2:123456789012:myTopic')
+        app.publish_message({'ProductName': 'bar'}, 'arn:aws:sns:us-west-2:123456789012:myTopic')
 
         mock_client.assert_called_once_with('sns', region_name='us-west-2')
         mock_sns.publish.assert_called_once_with(
@@ -142,7 +142,7 @@ def test_get_job_dict():
         mock_hyp3.get_job_by_id.return_value = job
         mock_constructor.return_value = mock_hyp3
 
-        job_dict = publish_app.get_job_dict('https://foo.com', 'myUser', 'myPass', 'abc123')
+        job_dict = app.get_job_dict('https://foo.com', 'myUser', 'myPass', 'abc123')
 
         assert job_dict == {
             'job_type': 'myJobType',
@@ -162,12 +162,12 @@ def test_process_message(monkeypatch):
     monkeypatch.setenv('TOPIC_ARN', 'myTopicArn')
 
     with (
-        patch('publish_app.get_job_dict', return_value={'a', 'b'}) as get_job_dict,
-        patch('publish_app.generate_ingest_message', return_value={'ProductName': 'foo'}) as generate_ingest_message,
-        patch('publish_app.exists_in_cmr', return_value=False) as exists_in_cmr,
-        patch('publish_app.publish_message') as publish_message,
+        patch('app.get_job_dict', return_value={'a', 'b'}) as get_job_dict,
+        patch('app.generate_ingest_message', return_value={'ProductName': 'foo'}) as generate_ingest_message,
+        patch('app.exists_in_cmr', return_value=False) as exists_in_cmr,
+        patch('app.publish_message') as publish_message,
     ):
-        publish_app.process_message({'hyp3_url': 'https://foo.com', 'job_id': 'abc123'})
+        app.process_message({'hyp3_url': 'https://foo.com', 'job_id': 'abc123'})
 
         get_job_dict.assert_called_once_with('https://foo.com', 'myUser', 'myPassword', 'abc123')
         generate_ingest_message.assert_called_once_with({'a', 'b'})
@@ -175,12 +175,12 @@ def test_process_message(monkeypatch):
         publish_message.assert_called_once_with({'ProductName': 'foo'}, 'myTopicArn')
 
     with (
-        patch('publish_app.get_job_dict', return_value={'c', 'd'}) as get_job_dict,
-        patch('publish_app.generate_ingest_message', return_value={'ProductName': 'bar'}) as generate_ingest_message,
-        patch('publish_app.exists_in_cmr', return_value=True) as exists_in_cmr,
-        patch('publish_app.publish_message') as publish_message,
+        patch('app.get_job_dict', return_value={'c', 'd'}) as get_job_dict,
+        patch('app.generate_ingest_message', return_value={'ProductName': 'bar'}) as generate_ingest_message,
+        patch('app.exists_in_cmr', return_value=True) as exists_in_cmr,
+        patch('app.publish_message') as publish_message,
     ):
-        publish_app.process_message({'hyp3_url': 'https://bar.com', 'job_id': 'def456'})
+        app.process_message({'hyp3_url': 'https://bar.com', 'job_id': 'def456'})
 
         get_job_dict.assert_called_once_with('https://bar.com', 'myUser', 'myPassword', 'def456')
         generate_ingest_message.assert_called_once_with({'c', 'd'})
@@ -195,8 +195,8 @@ def test_lambda_handler():
             {'body': '{"Message": "{\\"hyp3_url\\": \\"url2\\", \\"job_id\\": \\"id2\\"}"}'},
         ],
     }
-    with patch('publish_app.process_message') as mock_process_message:
-        assert publish_app.lambda_handler(event, None) == {'batchItemFailures': []}
+    with patch('app.process_message') as mock_process_message:
+        assert app.lambda_handler(event, None) == {'batchItemFailures': []}
         mock_process_message.assert_has_calls(
             [
                 call({'hyp3_url': 'url1', 'job_id': 'id1'}),
@@ -209,4 +209,4 @@ def test_lambda_handler():
             {'messageId': 'myMessageId', 'body': '{"Message": "bad message"}'},
         ],
     }
-    assert publish_app.lambda_handler(event, None) == {'batchItemFailures': [{'itemIdentifier': 'myMessageId'}]}
+    assert app.lambda_handler(event, None) == {'batchItemFailures': [{'itemIdentifier': 'myMessageId'}]}

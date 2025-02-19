@@ -15,5 +15,5 @@ jobs:
 
       - shell: bash -l {0}
         run: |
-          export PYTHONPATH=${PWD}/apps/publish-app/src:${PWD}/apps/publish-container/src
+          export PYTHONPATH=${PWD}/app/src:${PWD}/plugin/src
           pytest tests
