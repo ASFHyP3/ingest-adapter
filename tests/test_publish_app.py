@@ -1,5 +1,5 @@
 import datetime
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, call, patch
 
 import responses
 
@@ -92,15 +92,16 @@ def test_generate_ingest_message(monkeypatch):
             'Key': 'myPrefix/myFilename.nc',
         },
     }
-    now = datetime.datetime(2025, 2, 18, 1, 2, 3, 456)
 
+    now = datetime.datetime(2025, 2, 18, 1, 2, 3, 456)
     mock_datetime = MagicMock(wraps=datetime.datetime)
     mock_datetime.now.return_value = now
     monkeypatch.setattr(datetime, 'datetime', mock_datetime)
+
     assert publish_app.generate_ingest_message(job) == expected
 
 
-def test_publish_mesage():
+def test_publish_message():
     assert False
 
 
@@ -109,4 +110,24 @@ def test_process_message():
 
 
 def test_lambda_handler():
-    assert False
+    event = {
+        'Records': [
+            {'body': '{"Message": "{\\"hyp3_url\\": \\"url1\\", \\"job_id\\": \\"id1\\"}"}'},
+            {'body': '{"Message": "{\\"hyp3_url\\": \\"url2\\", \\"job_id\\": \\"id2\\"}"}'},
+        ],
+    }
+    with patch('publish_app.process_message') as mock_process_message:
+        assert publish_app.lambda_handler(event, None) == {'batchItemFailures': []}
+        mock_process_message.assert_has_calls(
+            [
+                call({'hyp3_url': 'url1', 'job_id': 'id1'}),
+                call({'hyp3_url': 'url2', 'job_id': 'id2'}),
+            ],
+        )
+
+    event = {
+        'Records': [
+            {'messageId': 'myMessageId', 'body': '{"Message": "bad message"}'},
+        ],
+    }
+    assert publish_app.lambda_handler(event, None) == {'batchItemFailures': [{'itemIdentifier': 'myMessageId'}]}
