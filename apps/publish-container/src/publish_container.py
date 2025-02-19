@@ -5,7 +5,7 @@ import os
 import boto3
 
 
-def publish(hyp3_api_url, job_id, topic_arn):
+def publish(hyp3_api_url: str, job_id: str, topic_arn: str) -> None:
     message = {
         'hyp3_api_url': hyp3_api_url,
         'job_id': job_id,
@@ -15,7 +15,7 @@ def publish(hyp3_api_url, job_id, topic_arn):
     sns.publish(TopicArn=topic_arn, Message=json.dumps(message))
 
 
-def get_args(args: list[str] | None = None):
+def get_args(args: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument('job_id', type=str)
     parser.add_argument('--hyp3-url', type=str, default=os.getenv('HYP3_URL'))
@@ -31,7 +31,7 @@ def get_args(args: list[str] | None = None):
     return parsed_args
 
 
-def main():
+def main() -> None:
     args = get_args()
     publish(args.hyp3_url, args.job_id, args.topic_arn)
 
