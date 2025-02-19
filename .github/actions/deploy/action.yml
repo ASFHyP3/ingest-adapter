@@ -52,7 +52,7 @@ runs:
           --stack-name ${{ inputs.APP_STACK_NAME }} \
           --template-file app_packaged.yml \
           --parameter-overrides \
-              IngestTopicArn='${{ inputs.INGEST_TOPIC_ARN }}'\
+              IngestTopicArn='${{ inputs.INGEST_TOPIC_ARN }}' \
               Hyp3AccountIds='${{ inputs.HYP3_ACCOUNT_IDS }}' \
               EarthdataUsername='${{ inputs.EARTHDATA_USERNAME }}' \
               EarthdataPassword='${{ inputs.EARTHDATA_PASSWORD }}' \
