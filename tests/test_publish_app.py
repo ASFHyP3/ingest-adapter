@@ -102,7 +102,29 @@ def test_generate_ingest_message(monkeypatch):
 
 
 def test_publish_message():
-    assert False
+    with patch('boto3.client') as mock_client:
+        mock_sns = MagicMock()
+        mock_client.return_value = mock_sns
+
+        publish_app.publish_message({'ProductName': 'foo'}, 'arn:aws:sns:us-east-1:123456789012:myTopic')
+
+        mock_client.assert_called_once_with('sns', region_name='us-east-1')
+        mock_sns.publish.assert_called_once_with(
+            TopicArn='arn:aws:sns:us-east-1:123456789012:myTopic',
+            Message='{"ProductName": "foo"}',
+        )
+
+    with patch('boto3.client') as mock_client:
+        mock_sns = MagicMock()
+        mock_client.return_value = mock_sns
+
+        publish_app.publish_message({'ProductName': 'bar'}, 'arn:aws:sns:us-west-2:123456789012:myTopic')
+
+        mock_client.assert_called_once_with('sns', region_name='us-west-2')
+        mock_sns.publish.assert_called_once_with(
+            TopicArn='arn:aws:sns:us-west-2:123456789012:myTopic',
+            Message='{"ProductName": "bar"}',
+        )
 
 
 def test_process_message():

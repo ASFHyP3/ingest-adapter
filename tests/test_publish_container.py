@@ -1,4 +1,5 @@
 import sys
+from unittest.mock import MagicMock, patch
 
 import pytest
 
@@ -39,4 +40,26 @@ def test_get_args(monkeypatch):
 
 
 def test_publish():
-    assert False
+    with patch('boto3.client') as mock_client:
+        mock_sns = MagicMock()
+        mock_client.return_value = mock_sns
+
+        publish_container.publish('https://foo.com', 'abc123', 'arn:aws:sns:us-east-1:123456789012:myTopic')
+
+        mock_client.assert_called_once_with('sns', region_name='us-east-1')
+        mock_sns.publish.assert_called_once_with(
+            TopicArn='arn:aws:sns:us-east-1:123456789012:myTopic',
+            Message='{"hyp3_api_url": "https://foo.com", "job_id": "abc123"}',
+        )
+
+    with patch('boto3.client') as mock_client:
+        mock_sns = MagicMock()
+        mock_client.return_value = mock_sns
+
+        publish_container.publish('https://bar.com', 'def456', 'arn:aws:sns:us-west-2:123456789012:myTopic')
+
+        mock_client.assert_called_once_with('sns', region_name='us-west-2')
+        mock_sns.publish.assert_called_once_with(
+            TopicArn='arn:aws:sns:us-west-2:123456789012:myTopic',
+            Message='{"hyp3_api_url": "https://bar.com", "job_id": "def456"}',
+        )

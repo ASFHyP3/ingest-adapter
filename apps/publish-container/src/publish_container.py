@@ -11,7 +11,7 @@ def publish(hyp3_api_url, job_id, topic_arn):
         'job_id': job_id,
     }
     region = topic_arn.split(':')[3]
-    sns = boto3.client('sns', region=region)
+    sns = boto3.client('sns', region_name=region)
     sns.publish(TopicArn=topic_arn, Message=json.dumps(message))
 
 

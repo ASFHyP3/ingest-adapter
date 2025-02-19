@@ -53,7 +53,7 @@ def generate_ingest_message(hyp3_job_dict: dict) -> dict:
 def publish_message(message: dict, topic_arn: str):
     print(f'Publishing {message["ProductName"]} to {topic_arn}')
     topic_region = topic_arn.split(':')[3]
-    sns = boto3.client(topic_arn, region=topic_region)
+    sns = boto3.client('sns', region_name=topic_region)
     sns.publish(
         TopicArn=topic_arn,
         Message=json.dumps(message),
