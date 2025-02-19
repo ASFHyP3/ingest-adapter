@@ -1,0 +1,29 @@
+name: Deploy to prod
+
+on:
+  push:
+    branches:
+      - main
+
+concurrency: deploy-prod
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    environment:
+      name: prod
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/deploy
+        with:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          CLOUDFORMATION_ROLE_ARN: ${{ secrets.CLOUDFORMATION_ROLE_ARN }}
+          EARTHDATA_USERNAME: ${{ secrets.EARTHDATA_USERNAME }}
+          EARTHDATA_PASSWORD: ${{ secrets.EARTHDATA_PASSWORD }}
+          TEMPLATE_BUCKET: '' # TODO
+          APP_STACK_NAME: 'ingets-adapater-prod'
+          HYP3_ACCOUNT_IDS: '' # TODO
+          INGEST_TOPIC_ARN: 'arn:aws:sns:us-east-1:406893895021:ingest-prod-jobs'
