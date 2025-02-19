@@ -161,17 +161,31 @@ def test_process_message(monkeypatch):
     monkeypatch.setenv('CMR_DOMAIN', 'cmr.earthdata.nasa.gov')
     monkeypatch.setenv('TOPIC_ARN', 'myTopicArn')
 
-    with (patch('publish_app.get_job_dict', return_value={'a', 'b'}) as get_job_dict,
-          patch('publish_app.generate_ingest_message', return_value={'ProductName': 'foo'}) as generate_ingest_message,
-          patch('publish_app.exists_in_cmr', return_value=False) as exists_in_cmr,
-          patch('publish_app.publish_message') as publish_message):
-
+    with (
+        patch('publish_app.get_job_dict', return_value={'a', 'b'}) as get_job_dict,
+        patch('publish_app.generate_ingest_message', return_value={'ProductName': 'foo'}) as generate_ingest_message,
+        patch('publish_app.exists_in_cmr', return_value=False) as exists_in_cmr,
+        patch('publish_app.publish_message') as publish_message,
+    ):
         publish_app.process_message({'hyp3_url': 'https://foo.com', 'job_id': 'abc123'})
 
         get_job_dict.assert_called_once_with('https://foo.com', 'myUser', 'myPassword', 'abc123')
         generate_ingest_message.assert_called_once_with({'a', 'b'})
         exists_in_cmr.assert_called_once_with('foo', 'cmr.earthdata.nasa.gov')
         publish_message.assert_called_once_with({'ProductName': 'foo'}, 'myTopicArn')
+
+    with (
+        patch('publish_app.get_job_dict', return_value={'c', 'd'}) as get_job_dict,
+        patch('publish_app.generate_ingest_message', return_value={'ProductName': 'bar'}) as generate_ingest_message,
+        patch('publish_app.exists_in_cmr', return_value=True) as exists_in_cmr,
+        patch('publish_app.publish_message') as publish_message,
+    ):
+        publish_app.process_message({'hyp3_url': 'https://bar.com', 'job_id': 'def456'})
+
+        get_job_dict.assert_called_once_with('https://bar.com', 'myUser', 'myPassword', 'def456')
+        generate_ingest_message.assert_called_once_with({'c', 'd'})
+        exists_in_cmr.assert_called_once_with('bar', 'cmr.earthdata.nasa.gov')
+        publish_message.assert_not_called()
 
 
 def test_lambda_handler():

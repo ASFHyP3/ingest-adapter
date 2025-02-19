@@ -14,12 +14,12 @@ def get_granule_ur_pattern(granule_ur: str) -> str:
 
 def exists_in_cmr(cmr_domain: str, granule_ur: str) -> bool:
     url = f'https://{cmr_domain}/search/granules.umm_json'
-    params = {
-        'short_name': 'ARIA_S1_GUNW',
-        'granule_ur': get_granule_ur_pattern(granule_ur),
-        'options[granule_ur][pattern]': 'true',
-        'page_size': 1,
-    }
+    params = (
+        ('short_name', 'ARIA_S1_GUNW'),
+        ('granule_ur', get_granule_ur_pattern(granule_ur)),
+        ('options[granule_ur][pattern]', 'true'),
+        ('page_size', 1),
+    )
     response = requests.get(url, params=params)
     response.raise_for_status()
     if response.json()['items']:
