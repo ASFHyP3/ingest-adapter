@@ -1,0 +1,19 @@
+name: Run tests
+
+on: push
+
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: mamba-org/setup-micromamba@v2
+        with:
+          environment-file: environment.yml
+
+      - shell: bash -l {0}
+        run: |
+          export PYTHONPATH=${PWD}/app/src:${PWD}/plugin/src
+          pytest tests
