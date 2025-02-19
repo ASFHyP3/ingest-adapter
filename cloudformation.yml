@@ -102,8 +102,16 @@ Resources:
             Version: "2012-10-17"
             Statement:
               - Effect: Allow
+                Action: sqs:*
+                Resource: !GetAtt Queue.Arn
+              - Effect: Allow
                 Action: sns:Publish
                 Resource: !Ref IngestTopicArn
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: !Sub "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/*"
 
   LambdaEventSourceMapping:
     Type: AWS::Lambda::EventSourceMapping
