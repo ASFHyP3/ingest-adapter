@@ -3,6 +3,7 @@ from unittest.mock import MagicMock, call, patch
 
 import hyp3_sdk
 import responses
+import pytest
 
 import app
 
@@ -162,7 +163,7 @@ def test_process_message(monkeypatch):
     monkeypatch.setenv('TOPIC_ARN', 'myTopicArn')
 
     with (
-        patch('app.get_job_dict', return_value={'a', 'b'}) as get_job_dict,
+        patch('app.get_job_dict', return_value={'job_type': 'ARIA_S1_GUNW'}) as get_job_dict,
         patch('app.generate_ingest_message', return_value={'ProductName': 'foo'}) as generate_ingest_message,
         patch('app.exists_in_cmr', return_value=False) as exists_in_cmr,
         patch('app.publish_message') as publish_message,
@@ -170,12 +171,12 @@ def test_process_message(monkeypatch):
         app.process_message({'hyp3_url': 'https://foo.com', 'job_id': 'abc123'})
 
         get_job_dict.assert_called_once_with('https://foo.com', 'myUser', 'myPassword', 'abc123')
-        generate_ingest_message.assert_called_once_with({'a', 'b'})
+        generate_ingest_message.assert_called_once_with({'job_type': 'ARIA_S1_GUNW'})
         exists_in_cmr.assert_called_once_with('foo', 'cmr.earthdata.nasa.gov')
         publish_message.assert_called_once_with({'ProductName': 'foo'}, 'myTopicArn')
 
     with (
-        patch('app.get_job_dict', return_value={'c', 'd'}) as get_job_dict,
+        patch('app.get_job_dict', return_value={'job_type': 'ARIA_S1_GUNW'}) as get_job_dict,
         patch('app.generate_ingest_message', return_value={'ProductName': 'bar'}) as generate_ingest_message,
         patch('app.exists_in_cmr', return_value=True) as exists_in_cmr,
         patch('app.publish_message') as publish_message,
@@ -183,8 +184,22 @@ def test_process_message(monkeypatch):
         app.process_message({'hyp3_url': 'https://bar.com', 'job_id': 'def456'})
 
         get_job_dict.assert_called_once_with('https://bar.com', 'myUser', 'myPassword', 'def456')
-        generate_ingest_message.assert_called_once_with({'c', 'd'})
+        generate_ingest_message.assert_called_once_with({'job_type': 'ARIA_S1_GUNW'})
         exists_in_cmr.assert_called_once_with('bar', 'cmr.earthdata.nasa.gov')
+        publish_message.assert_not_called()
+
+    with (
+        patch('app.get_job_dict', return_value={'job_type': 'BAD_JOB_TYPE'}) as get_job_dict,
+        patch('app.generate_ingest_message') as generate_ingest_message,
+        patch('app.exists_in_cmr') as exists_in_cmr,
+        patch('app.publish_message') as publish_message,
+    ):
+        with pytest.raises(ValueError):
+            app.process_message({'hyp3_url': 'https://bar.com', 'job_id': 'def456'})
+
+        get_job_dict.assert_called_once_with('https://bar.com', 'myUser', 'myPassword', 'def456')
+        generate_ingest_message.assert_not_called()
+        exists_in_cmr.assert_not_called()
         publish_message.assert_not_called()
 
 
