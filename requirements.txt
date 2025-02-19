@@ -1,5 +1,5 @@
--r apps/publish-app/requirements.txt
--r apps/publish-container/requirements.txt
+-r app/requirements.txt
+-r plugin/requirements.txt
 mypy==1.15.0
 ruff==0.9.6
 pytest==8.3.4

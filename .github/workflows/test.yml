@@ -23,7 +23,7 @@ jobs:
 
       - shell: bash -l {0}
         run: |
-          export PYTHONPATH=${PWD}/apps/publish-app/src:${PWD}/apps/publish-container/src
+          export PYTHONPATH=${PWD}/app/src:${PWD}/plugin/src
           pytest tests
 
   get-version:
@@ -43,6 +43,6 @@ jobs:
       release_branch: main
       develop_branch: develop
       user: tools-bot
-      file: apps/publish-container/Dockerfile
+      file: plugin/Dockerfile
     secrets:
       USER_TOKEN: ${{ secrets.GITHUB_TOKEN }}
