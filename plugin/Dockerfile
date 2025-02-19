@@ -6,4 +6,4 @@ COPY plugin/requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY plugin/src/ ./
-CMD ["python", "./plugin.py"]
+ENTRYPOINT ["python", "./plugin.py"]
