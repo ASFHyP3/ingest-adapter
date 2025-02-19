@@ -2,8 +2,8 @@ import datetime
 from unittest.mock import MagicMock, call, patch
 
 import hyp3_sdk
-import responses
 import pytest
+import responses
 
 import app
 
