@@ -5,9 +5,9 @@ import os
 import boto3
 
 
-def publish(hyp3_api_url: str, job_id: str, topic_arn: str) -> None:
+def publish(hyp3_url: str, job_id: str, topic_arn: str) -> None:
     message = {
-        'hyp3_api_url': hyp3_api_url,
+        'hyp3_url': hyp3_url,
         'job_id': job_id,
     }
     region = topic_arn.split(':')[3]
