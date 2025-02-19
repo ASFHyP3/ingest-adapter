@@ -1,6 +1,14 @@
-name: Run tests
+name: Run tests and build docker container
 
-on: push
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
 
 jobs:
   pytest:
@@ -17,3 +25,24 @@ jobs:
         run: |
           export PYTHONPATH=${PWD}/apps/publish-app/src:${PWD}/apps/publish-container/src
           pytest tests
+
+  get-version:
+    # Docs: https://github.com/ASFHyP3/actions
+    uses: ASFHyP3/actions/.github/workflows/reusable-version-info.yml@v0.17.1
+    with:
+      python_version: "3.13"
+
+  build:
+    needs:
+      - pytest
+      - get-version
+    # Docs: https://github.com/ASFHyP3/actions
+    uses: ASFHyP3/actions/.github/workflows/reusable-docker-ghcr.yml@v0.17.1
+    with:
+      version_tag: ${{ needs.get-version.outputs.version_tag }}
+      release_branch: main
+      develop_branch: develop
+      user: tools-bot
+      file: apps/publish-container/Dockerfile
+    secrets:
+      USER_TOKEN: ${{ secrets.GITHUB_TOKEN }}
