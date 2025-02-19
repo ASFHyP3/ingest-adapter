@@ -1,5 +1,19 @@
 AWSTemplateFormatVersion: 2010-09-09
 
+Parameters:
+  IngestTopicArn:
+    Type: String
+
+  Hyp3AccountIds:
+    Type: CommaDelimitedList
+
+  EarthdataUsername:
+    Type: String
+
+  EarthdataPassword:
+    Type: String
+    NoEcho: true
+
 Resources:
   PublishTopic:
     Type: AWS::SNS::Topic
@@ -14,15 +28,11 @@ Resources:
       PolicyDocument:
         Version: 2012-10-17
         Statement:
-          - Sid: AllowServices # TODO: Add correct permissions
-            Effect: Allow
+          - Effect: Allow
             Principal:
-              Service:
-                - events.amazonaws.com
-                - cloudwatch.amazonaws.com
-            Action: 'sns:Publish'
-            Resource:
-              - !Ref PublishTopic
+              AWS: !Ref Hyp3AccountIds
+            Action: sns:Publish
+            Resource: !Ref PublishTopic
       Topics:
         - !Ref PublishTopic
 
@@ -35,7 +45,7 @@ Resources:
     Type: AWS::SQS::Queue
     Properties:
       MessageRetentionPeriod: 1209600
-      VisibilityTimeout: 28800
+      VisibilityTimeout: 3600 # 1 hr
       RedrivePolicy:
         deadLetterTargetArn: !GetAtt DeadLetterQueue.Arn
         maxReceiveCount: 3
@@ -61,11 +71,20 @@ Resources:
     Type: AWS::Lambda::Function
     Properties:
       Code: apps/publish-app/src
-      Handler: publish_app.lambda_handler
+      Handler: app.lambda_handler
       MemorySize: 128
       Role: !GetAtt LambdaRole.Arn
       Runtime: python3.13
-      Timeout: 900
+      Timeout: 300
+      Environment:
+        Variables:
+          SECRET_ARN: !Ref EDLSecret
+
+  EDLSecret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Description: !Sub "${AWS::StackName} Earthdata credentials"
+      SecretString: !Sub '{"username": "${EarthdataUsername}", "password": "${EarthdataPassword}"}'
 
   LambdaRole:
     Type: AWS::IAM::Role
@@ -77,25 +96,22 @@ Resources:
           Principal:
             Service: lambda.amazonaws.com
           Effect: Allow
-      Policies: # TODO: Add correct permissions
+      Policies:
         - PolicyName: root
           PolicyDocument:
             Version: "2012-10-17"
             Statement:
               - Effect: Allow
-                Action: '*'
-                Resource: '*'
+                Action: sns:Publish
+                Resource: !Ref IngestTopicArn
 
   LambdaEventSourceMapping:
     Type: AWS::Lambda::EventSourceMapping
     Properties:
       FunctionName: !Ref Lambda
-      BatchSize: 1
       EventSourceArn: !GetAtt Queue.Arn
       FunctionResponseTypes:
         - ReportBatchItemFailures
-      ScalingConfig:
-        MaximumConcurrency: 100
 
   LambdaLogGroup:
     Type: AWS::Logs::LogGroup
