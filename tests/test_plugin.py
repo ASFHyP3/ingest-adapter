@@ -49,7 +49,7 @@ def test_publish():
         mock_client.assert_called_once_with('sns', region_name='us-east-1')
         mock_sns.publish.assert_called_once_with(
             TopicArn='arn:aws:sns:us-east-1:123456789012:myTopic',
-            Message='{"hyp3_api_url": "https://foo.com", "job_id": "abc123"}',
+            Message='{"hyp3_url": "https://foo.com", "job_id": "abc123"}',
         )
 
     with patch('boto3.client') as mock_client:
@@ -61,5 +61,5 @@ def test_publish():
         mock_client.assert_called_once_with('sns', region_name='us-west-2')
         mock_sns.publish.assert_called_once_with(
             TopicArn='arn:aws:sns:us-west-2:123456789012:myTopic',
-            Message='{"hyp3_api_url": "https://bar.com", "job_id": "def456"}',
+            Message='{"hyp3_url": "https://bar.com", "job_id": "def456"}',
         )
