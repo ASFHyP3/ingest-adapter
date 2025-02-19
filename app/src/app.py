@@ -75,7 +75,7 @@ def process_message(message: dict) -> None:
         publish_message(ingest_message, os.environ['TOPIC_ARN'])
 
 
-def lambda_handler(event: dict, _) -> dict:
+def lambda_handler(event: dict, _: object) -> dict:
     batch_item_failures = []
     for record in event['Records']:
         try:
