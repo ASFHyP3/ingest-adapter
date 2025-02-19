@@ -69,7 +69,7 @@ def get_job_dict(hyp3_url: str, username: str, password: str, job_id: str) -> di
 def process_message(message: dict) -> None:
     job = get_job_dict(message['hyp3_url'], os.environ['EDL_USERNAME'], os.environ['EDL_PASSWORD'], message['job_id'])
     ingest_message = generate_ingest_message(job)
-    if not exists_in_cmr(ingest_message['ProductName'], os.environ['CMR_DOMAIN']):
+    if not exists_in_cmr(os.environ['CMR_DOMAIN'], ingest_message['ProductName']):
         publish_message(ingest_message, os.environ['TOPIC_ARN'])
 
 
