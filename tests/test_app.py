@@ -194,7 +194,7 @@ def test_process_message(monkeypatch):
         patch('app.exists_in_cmr') as exists_in_cmr,
         patch('app.publish_message') as publish_message,
     ):
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError, match=r'^Job type BAD_JOB_TYPE is not supported.*'):
             app.process_message({'hyp3_url': 'https://bar.com', 'job_id': 'def456'})
 
         get_job_dict.assert_called_once_with('https://bar.com', 'myUser', 'myPassword', 'def456')
