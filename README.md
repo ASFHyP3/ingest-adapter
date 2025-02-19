@@ -1,5 +1,7 @@
 # ingest-adapter
-An application for publishing HyP3 output products for ingest into ASF's data catalog
+
+An application for publishing HyP3 output products for ingest into ASF's data catalog. 
+It contains a hyp3 plugin and an application for publishing jobs sent to it from the hyp3 plugin.
 
 ## Usage
 
@@ -17,14 +19,8 @@ that looks like this:
       vcpu: 1
       memory: 512
       secrets:
-        - INGEST_ADAPTER_SNS_TOPIC_ARN
-        - HYP3_API_URL
-```
-
-To use the app directly to publish a job run
-
-```
-ingest_adapter https://hyp3-api.asf.alaska.edu (job_id)
+        - TOPIC_ARN
+        - HYP3_URL
 ```
 
 ## Developer Setup
@@ -33,10 +29,6 @@ To run all commands in sequence use:
 ```bash
 git clone https://github.com/ASFHyP3/ingest-adapter.git
 mamba env create -f environment.yml
-export PYTHONPATH=....
+export PYTHONPATH=.... # TODO: What to add to python path
 pytest tests
 ```
-
-## Deployment
-
-TODO
