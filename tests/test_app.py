@@ -240,7 +240,7 @@ def test_lambda_handler():
                 call({'hyp3_url': 'url2', 'job_id': 'id2'}, credentials),
             ],
         )
-        mock_load_credentials.assert_called()
+        mock_load_credentials.assert_called_once()
 
     event = {
         'Records': [
