@@ -2,6 +2,7 @@ import datetime
 import json
 import os
 import pathlib
+import traceback
 
 import boto3
 import hyp3_sdk
@@ -66,24 +67,39 @@ def get_job_dict(hyp3_url: str, username: str, password: str, job_id: str) -> di
     return job.to_dict()
 
 
-def process_message(message: dict) -> None:
-    job = get_job_dict(message['hyp3_url'], os.environ['EDL_USERNAME'], os.environ['EDL_PASSWORD'], message['job_id'])
+def process_message(message: dict, edl_credentials: dict) -> None:
+    username, password = edl_credentials['username'], edl_credentials['password']
+    job = get_job_dict(message['hyp3_url'], username, password, message['job_id'])
+
     if job['job_type'] != 'ARIA_S1_GUNW':
         raise ValueError(f'Job type {job["job_type"]} is not supported; must be ARIA_S1_GUNW')
     ingest_message = generate_ingest_message(job)
     if not exists_in_cmr(os.environ['CMR_DOMAIN'], ingest_message['ProductName']):
-        publish_message(ingest_message, os.environ['TOPIC_ARN'])
+        publish_message(ingest_message, os.environ['INGEST_TOPIC_ARN'])
+
+
+def load_credentials() -> dict:
+    secret_arn = os.environ['SECRET_ARN']
+    secretsmanager = boto3.client('secretsmanager')
+
+    response = secretsmanager.get_secret_value(SecretId=secret_arn)
+    credentials = json.loads(response['SecretString'])
+
+    return credentials
 
 
 def lambda_handler(event: dict, _: object) -> dict:
     batch_item_failures = []
+
+    credentials = load_credentials()
+
     for record in event['Records']:
         try:
             body = json.loads(record['body'])
             message = json.loads(body['Message'])
-            process_message(message)
-        except Exception as e:
+            process_message(message, credentials)
+        except Exception:
+            print(traceback.format_exc())
             print(f'Could not process message {record["messageId"]}')
-            print(e)
             batch_item_failures.append({'itemIdentifier': record['messageId']})
     return {'batchItemFailures': batch_item_failures}
