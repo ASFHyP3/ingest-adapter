@@ -12,7 +12,6 @@ that looks like this:
 - name: PUBLISH
   image: ghcr.io/ASFHyP3/ingest-adapter
   command:
-    - --job-id
     - Ref::bucket_prefix
   timeout: 600
   compute_environment: Default
