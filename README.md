@@ -8,20 +8,19 @@ It contains a HyP3 plugin and an application for publishing jobs sent to it from
 To allow for a HyP3 job to publish its outputs, use the ingest-adapter container and add it as a step to the job_spec file
 that looks like this:
 
-```
-      - name: PUBLISH
-      image: ghcr.io/ASFHyP3/ingest-adapter
-      command:
-        - --job-id
-        - Ref::bucket_prefix
-      timeout: 600
-      compute_environment: Default
-      vcpu: 1
-      memory: 512
-      secrets:
-        - TOPIC_ARN
-        - HYP3_URL
-```
+```yaml
+- name: PUBLISH
+  image: ghcr.io/ASFHyP3/ingest-adapter
+  command:
+    - --job-id
+    - Ref::bucket_prefix
+  timeout: 600
+  compute_environment: Default
+  vcpu: 1
+  memory: 512
+  secrets:
+    - TOPIC_ARN
+    - HYP3_URL
 
 ## Developer Setup
 
