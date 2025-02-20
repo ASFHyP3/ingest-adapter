@@ -21,10 +21,12 @@ that looks like this:
   secrets:
     - TOPIC_ARN
     - HYP3_URL
+```
 
 ## Developer Setup
 
 To run all commands in sequence use:
+
 ```bash
 mamba env create -f environment.yml
 export PYTHONPATH=${PWD}/app/src:${PWD}/plugin/src
