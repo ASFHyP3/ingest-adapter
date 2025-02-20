@@ -1,12 +1,18 @@
-name: Create Release
+name: Tag version and create release
 
 on:
   push:
-    tags:
-      - 'v*'
+    branches:
+      - main
 
 jobs:
-  call-release-workflow:
+  create-tag:
+    uses: ASFHyP3/actions/.github/workflows/reusable-bump-version.yml@v0.17.1
+    secrets:
+      USER_TOKEN: ${{ secrets.TOOLS_BOT_PAK }}
+
+  create-release:
+    needs: create-tag
     uses: ASFHyP3/actions/.github/workflows/reusable-release.yml@v0.17.1
     with:
       release_prefix: Ingest Adapter
