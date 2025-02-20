@@ -29,6 +29,6 @@ To run all commands in sequence use:
 ```bash
 git clone https://github.com/ASFHyP3/ingest-adapter.git
 mamba env create -f environment.yml
-export PYTHONPATH=.... # TODO: What to add to python path
+export PYTHONPATH=${PWD}/app/src:${PWD}/plugin/src
 pytest tests
 ```
