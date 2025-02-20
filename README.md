@@ -1,7 +1,7 @@
 # ingest-adapter
 
 An application for publishing HyP3 output products for ingest into ASF's data catalog. 
-It contains a hyp3 plugin and an application for publishing jobs sent to it from the hyp3 plugin.
+It contains a HyP3 plugin and an application for publishing jobs sent to it from the HyP3 plugin.
 
 ## Usage
 
