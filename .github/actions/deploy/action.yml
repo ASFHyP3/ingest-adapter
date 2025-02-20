@@ -51,6 +51,7 @@ runs:
         aws cloudformation deploy \
           --stack-name ${{ inputs.APP_STACK_NAME }} \
           --template-file app_packaged.yml \
+          --capabilities CAPABILITY_IAM \
           --parameter-overrides \
               IngestTopicArn='${{ inputs.INGEST_TOPIC_ARN }}' \
               Hyp3AccountIds='${{ inputs.HYP3_ACCOUNT_IDS }}' \
