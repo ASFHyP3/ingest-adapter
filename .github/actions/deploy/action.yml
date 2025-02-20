@@ -45,7 +45,7 @@ runs:
       shell: bash
       run: |
         aws cloudformation package \
-          --template-file cloudformation.yml \
+          --template-file app/cloudformation.yml \
           --s3-bucket ${{ inputs.TEMPLATE_BUCKET }} \
           --output-template-file app_packaged.yml
         aws cloudformation deploy \
