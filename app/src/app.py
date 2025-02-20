@@ -75,7 +75,7 @@ def process_message(message: dict, edl_credentials: dict) -> None:
         raise ValueError(f'Job type {job["job_type"]} is not supported; must be ARIA_S1_GUNW')
     ingest_message = generate_ingest_message(job)
     if not exists_in_cmr(os.environ['CMR_DOMAIN'], ingest_message['ProductName']):
-        publish_message(ingest_message, os.environ['TOPIC_ARN'])
+        publish_message(ingest_message, os.environ['INGEST_TOPIC_ARN'])
 
 
 def load_credentials() -> dict:
