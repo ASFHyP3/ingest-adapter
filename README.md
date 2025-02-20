@@ -5,7 +5,7 @@ It contains a HyP3 plugin and an application for publishing jobs sent to it from
 
 ## Usage
 
-To allow for a HyP3 job to publish its outputs, use the ingest-adapter container and add it as a step to the job_spec file
+To allow for a HyP3 job to publish its outputs, use the ingest-adapter container and add it as a step to the job spec file
 that looks like this:
 
 ```yaml
