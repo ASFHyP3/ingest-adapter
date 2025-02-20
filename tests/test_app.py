@@ -159,7 +159,7 @@ def test_get_job_dict():
 
 def test_process_message(monkeypatch):
     monkeypatch.setenv('CMR_DOMAIN', 'cmr.earthdata.nasa.gov')
-    monkeypatch.setenv('TOPIC_ARN', 'myTopicArn')
+    monkeypatch.setenv('INGEST_TOPIC_ARN', 'myTopicArn')
     credentials = {
         'username': 'myUsername',
         'password': 'myPassword',
