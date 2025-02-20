@@ -113,6 +113,9 @@ Resources:
                 Action: sqs:*
                 Resource: !GetAtt Queue.Arn
               - Effect: Allow
+                Action: secretsmanager:GetSecretValue
+                Resource: !Ref EDLSecret
+              - Effect: Allow
                 Action: sns:Publish
                 Resource: !Ref IngestTopicArn
               - Effect: Allow

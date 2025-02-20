@@ -1,4 +1,5 @@
 import datetime
+import json
 from unittest.mock import MagicMock, call, patch
 
 import hyp3_sdk
@@ -157,10 +158,12 @@ def test_get_job_dict():
 
 
 def test_process_message(monkeypatch):
-    monkeypatch.setenv('EDL_USERNAME', 'myUser')
-    monkeypatch.setenv('EDL_PASSWORD', 'myPassword')
     monkeypatch.setenv('CMR_DOMAIN', 'cmr.earthdata.nasa.gov')
     monkeypatch.setenv('TOPIC_ARN', 'myTopicArn')
+    credentials = {
+        'username': 'myUsername',
+        'password': 'myPassword',
+    }
 
     with (
         patch('app.get_job_dict', return_value={'job_type': 'ARIA_S1_GUNW'}) as get_job_dict,
@@ -168,9 +171,9 @@ def test_process_message(monkeypatch):
         patch('app.exists_in_cmr', return_value=False) as exists_in_cmr,
         patch('app.publish_message') as publish_message,
     ):
-        app.process_message({'hyp3_url': 'https://foo.com', 'job_id': 'abc123'})
+        app.process_message({'hyp3_url': 'https://foo.com', 'job_id': 'abc123'}, credentials)
 
-        get_job_dict.assert_called_once_with('https://foo.com', 'myUser', 'myPassword', 'abc123')
+        get_job_dict.assert_called_once_with('https://foo.com', 'myUsername', 'myPassword', 'abc123')
         generate_ingest_message.assert_called_once_with({'job_type': 'ARIA_S1_GUNW'})
         exists_in_cmr.assert_called_once_with('cmr.earthdata.nasa.gov', 'foo')
         publish_message.assert_called_once_with({'ProductName': 'foo'}, 'myTopicArn')
@@ -181,9 +184,9 @@ def test_process_message(monkeypatch):
         patch('app.exists_in_cmr', return_value=True) as exists_in_cmr,
         patch('app.publish_message') as publish_message,
     ):
-        app.process_message({'hyp3_url': 'https://bar.com', 'job_id': 'def456'})
+        app.process_message({'hyp3_url': 'https://bar.com', 'job_id': 'def456'}, credentials)
 
-        get_job_dict.assert_called_once_with('https://bar.com', 'myUser', 'myPassword', 'def456')
+        get_job_dict.assert_called_once_with('https://bar.com', 'myUsername', 'myPassword', 'def456')
         generate_ingest_message.assert_called_once_with({'job_type': 'ARIA_S1_GUNW'})
         exists_in_cmr.assert_called_once_with('cmr.earthdata.nasa.gov', 'bar')
         publish_message.assert_not_called()
@@ -195,12 +198,26 @@ def test_process_message(monkeypatch):
         patch('app.publish_message') as publish_message,
     ):
         with pytest.raises(ValueError, match=r'^Job type BAD_JOB_TYPE is not supported.*'):
-            app.process_message({'hyp3_url': 'https://bar.com', 'job_id': 'def456'})
+            app.process_message({'hyp3_url': 'https://bar.com', 'job_id': 'def456'}, credentials)
 
-        get_job_dict.assert_called_once_with('https://bar.com', 'myUser', 'myPassword', 'def456')
+        get_job_dict.assert_called_once_with('https://bar.com', 'myUsername', 'myPassword', 'def456')
         generate_ingest_message.assert_not_called()
         exists_in_cmr.assert_not_called()
         publish_message.assert_not_called()
+
+
+def test_load_credentials(monkeypatch):
+    credentials = {'username': 'myUsername', 'password': 'myPassword'}
+
+    with patch('boto3.client') as mock_client, monkeypatch.context() as m:
+        m.setenv('SECRET_ARN', 'arn')
+
+        mock_secrets_manager = MagicMock()
+        mock_secrets_manager.get_secret_value.return_value = {'SecretString': json.dumps(credentials)}
+        mock_client.return_value = mock_secrets_manager
+
+        loaded_creds = app.load_credentials()
+        assert loaded_creds == credentials
 
 
 def test_lambda_handler():
@@ -210,18 +227,25 @@ def test_lambda_handler():
             {'body': '{"Message": "{\\"hyp3_url\\": \\"url2\\", \\"job_id\\": \\"id2\\"}"}'},
         ],
     }
-    with patch('app.process_message') as mock_process_message:
+    credentials = {'username': 'myUsername', 'password': 'myPassword'}
+
+    with (
+        patch('app.process_message') as mock_process_message,
+        patch('app.load_credentials', return_value=credentials) as mock_load_credentials,
+    ):
         assert app.lambda_handler(event, None) == {'batchItemFailures': []}
         mock_process_message.assert_has_calls(
             [
-                call({'hyp3_url': 'url1', 'job_id': 'id1'}),
-                call({'hyp3_url': 'url2', 'job_id': 'id2'}),
+                call({'hyp3_url': 'url1', 'job_id': 'id1'}, credentials),
+                call({'hyp3_url': 'url2', 'job_id': 'id2'}, credentials),
             ],
         )
+        mock_load_credentials.assert_called_once()
 
     event = {
         'Records': [
             {'messageId': 'myMessageId', 'body': '{"Message": "bad message"}'},
         ],
     }
-    assert app.lambda_handler(event, None) == {'batchItemFailures': [{'itemIdentifier': 'myMessageId'}]}
+    with patch('app.load_credentials', return_value=credentials) as mock_load_credentials:
+        assert app.lambda_handler(event, None) == {'batchItemFailures': [{'itemIdentifier': 'myMessageId'}]}
