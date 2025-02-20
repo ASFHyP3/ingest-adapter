@@ -2,6 +2,7 @@ import datetime
 import json
 import os
 import pathlib
+import traceback
 
 import boto3
 import hyp3_sdk
@@ -97,8 +98,8 @@ def lambda_handler(event: dict, _: object) -> dict:
             body = json.loads(record['body'])
             message = json.loads(body['Message'])
             process_message(message, credentials)
-        except Exception as e:
+        except Exception:
+            print(traceback.format_exc())
             print(f'Could not process message {record["messageId"]}')
-            print(e)
             batch_item_failures.append({'itemIdentifier': record['messageId']})
     return {'batchItemFailures': batch_item_failures}
