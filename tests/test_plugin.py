@@ -12,7 +12,7 @@ def test_get_args(monkeypatch):
     assert args.topic_arn == 'bar'
     assert args.job_id == '123'
 
-    with pytest.raises(ValueError):
+    with pytest.raises(SystemExit):
         plugin.get_args()
 
     with pytest.raises(ValueError):

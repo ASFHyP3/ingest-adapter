@@ -8,9 +8,6 @@ import hyp3_sdk
 import requests
 
 
-secretsmanager = boto3.client('secretsmanager')
-
-
 def get_granule_ur_pattern(granule_ur: str) -> str:
     return granule_ur.rsplit('-', 1)[0] + '-*'
 
@@ -82,6 +79,8 @@ def process_message(message: dict, edl_credentials: dict) -> None:
 
 def load_credentials() -> dict:
     secret_arn = os.environ['SECRET_ARN']
+    secretsmanager = boto3.client('secretsmanager')
+
     response = secretsmanager.get_secret_value(SecretId=secret_arn)
     credentials = json.loads(response['SecretString'])
 
