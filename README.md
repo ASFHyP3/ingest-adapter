@@ -26,7 +26,6 @@ that looks like this:
 
 To run all commands in sequence use:
 ```bash
-git clone https://github.com/ASFHyP3/ingest-adapter.git
 mamba env create -f environment.yml
 export PYTHONPATH=${PWD}/app/src:${PWD}/plugin/src
 pytest tests
