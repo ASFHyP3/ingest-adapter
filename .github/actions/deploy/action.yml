@@ -1,0 +1,60 @@
+name: Deploy to AWS
+description: Deploys the ingest adapter app
+
+inputs:
+  AWS_ACCESS_KEY_ID:
+    required: true
+  AWS_SECRET_ACCESS_KEY:
+    required: true
+  TEMPLATE_BUCKET:
+    required: true
+  APP_STACK_NAME:
+    required: true
+  INGEST_TOPIC_ARN:
+    required: true
+  HYP3_ACCOUNT_IDS:
+    required: true
+  EARTHDATA_USERNAME:
+    required: true
+  EARTHDATA_PASSWORD:
+    required: true
+  CMR_DOMAIN:
+    required: true
+
+runs:
+  using: composite
+  steps:
+
+    - uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ inputs.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ inputs.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-west-2
+
+    - uses: actions/setup-python@v5
+      with:
+        python-version: 3.13
+
+    - name: install dependencies
+      shell: bash
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install -r app/requirements.txt -t app/src
+
+    - name: package and deploy the app stack
+      shell: bash
+      run: |
+        aws cloudformation package \
+          --template-file cloudformation.yml \
+          --s3-bucket ${{ inputs.TEMPLATE_BUCKET }} \
+          --output-template-file app_packaged.yml
+        aws cloudformation deploy \
+          --stack-name ${{ inputs.APP_STACK_NAME }} \
+          --template-file app_packaged.yml \
+          --capabilities CAPABILITY_IAM \
+          --parameter-overrides \
+              IngestTopicArn='${{ inputs.INGEST_TOPIC_ARN }}' \
+              Hyp3AccountIds='${{ inputs.HYP3_ACCOUNT_IDS }}' \
+              EarthdataUsername='${{ inputs.EARTHDATA_USERNAME }}' \
+              EarthdataPassword='${{ inputs.EARTHDATA_PASSWORD }}' \
+              CmrDomain='${{ inputs.CMR_DOMAIN }}'
