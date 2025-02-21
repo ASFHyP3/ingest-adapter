@@ -12,7 +12,7 @@ that looks like this:
 - name: PUBLISH
   image: ghcr.io/ASFHyP3/ingest-adapter
   command:
-    - Ref::bucket_prefix
+    - Ref::job_id
   timeout: 600
   compute_environment: Default
   vcpu: 1
