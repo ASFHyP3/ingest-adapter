@@ -28,8 +28,8 @@ case-sensitive = true
 lines-after-imports = 2
 
 [tool.ruff.lint.extend-per-file-ignores]
-"tests/*" = ["ANN"]
 "*" = ["D100", "D103"]
+"tests/*" = ["ANN"]
 
 [tool.mypy]
 python_version = "3.13"
