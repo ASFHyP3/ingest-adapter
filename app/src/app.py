@@ -88,7 +88,7 @@ def load_credentials() -> dict:
     return credentials
 
 
-def lambda_handler(event: dict, _: object) -> dict:
+def lambda_handler(event: dict, _) -> dict:
     batch_item_failures = []
 
     credentials = load_credentials()
