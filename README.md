@@ -3,7 +3,7 @@
 An application for publishing HyP3 output products for ingest into ASF's data catalog. 
 It contains a HyP3 plugin and an application for publishing jobs sent to it from the HyP3 plugin.
 
-Support is currently limited to publishing the outputs of `S1_ARIA_GUNW` jobs to the `S1_ARIA_GUNW` CMR collection.
+Support is currently limited to publishing the outputs of `ARIA_S1_GUNW` jobs to the `ARIA_S1_GUNW` CMR collection.
 
 ## Usage
 
