@@ -1,16 +1,11 @@
-name: Tag version and create release
+name: Create release and sync to default branch
 
 on:
   push:
-    branches:
-      - main
+    tags:
+      - v*
 
 jobs:
-  create-tag:
-    uses: ASFHyP3/actions/.github/workflows/reusable-bump-version.yml@v0.17.1
-    secrets:
-      USER_TOKEN: ${{ secrets.TOOLS_BOT_PAK }}
-
   create-release:
     needs: create-tag
     uses: ASFHyP3/actions/.github/workflows/reusable-release.yml@v0.17.1
