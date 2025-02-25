@@ -24,5 +24,6 @@ jobs:
         with:
           environment-file: environment.yml
 
-      - run: |
+      - shell: bash -l {0}
+        run: |
           cfn-lint --info --ignore-checks W3002 --template app/cloudformation.yml
