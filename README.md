@@ -10,7 +10,7 @@ that looks like this:
 
 ```yaml
 - name: PUBLISH
-  image: ghcr.io/ASFHyP3/ingest-adapter
+  image: ghcr.io/asfhyp3/ingest-adapter
   command:
     - Ref::job_id
   timeout: 600
