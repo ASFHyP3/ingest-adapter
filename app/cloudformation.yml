@@ -1,0 +1,139 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Parameters:
+  IngestTopicArn:
+    Type: String
+
+  Hyp3AccountIds:
+    Type: CommaDelimitedList
+
+  EarthdataUsername:
+    Type: String
+
+  EarthdataPassword:
+    Type: String
+    NoEcho: true
+
+  CmrDomain:
+    Type: String
+    AllowedValues:
+      - cmr.earthdata.nasa.gov
+      - cmr.uat.earthdata.nasa.gov
+
+Resources:
+  PublishTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      Subscription:
+        - Endpoint: !GetAtt Queue.Arn
+          Protocol: sqs
+
+  SnsIAMPolicy:
+    Type: AWS::SNS::TopicPolicy
+    Properties:
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS: !Ref Hyp3AccountIds
+            Action: sns:Publish
+            Resource: !Ref PublishTopic
+      Topics:
+        - !Ref PublishTopic
+
+  DeadLetterQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      MessageRetentionPeriod: 1209600
+
+  Queue:
+    Type: AWS::SQS::Queue
+    Properties:
+      MessageRetentionPeriod: 1209600
+      VisibilityTimeout: 3600 # 1 hr
+      RedrivePolicy:
+        deadLetterTargetArn: !GetAtt DeadLetterQueue.Arn
+        maxReceiveCount: 3
+
+  QueuePolicy:
+    Type: AWS::SQS::QueuePolicy
+    Properties:
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: sns.amazonaws.com
+            Action: sqs:SendMessage
+            Resource: !GetAtt Queue.Arn
+            Condition:
+              ArnEquals:
+                aws:SourceArn: [!Ref PublishTopic]
+      Queues:
+        - !Ref Queue
+
+  Lambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code: src
+      Handler: app.lambda_handler
+      MemorySize: 128
+      Role: !GetAtt LambdaRole.Arn
+      Runtime: python3.13
+      Timeout: 300
+      Environment:
+        Variables:
+          SECRET_ARN: !Ref EDLSecret
+          INGEST_TOPIC_ARN: !Ref IngestTopicArn
+          CMR_DOMAIN: !Ref CmrDomain
+
+  EDLSecret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Description: !Sub "${AWS::StackName} Earthdata credentials"
+      SecretString: !Sub '{"username": "${EarthdataUsername}", "password": "${EarthdataPassword}"}'
+
+  LambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          Action: sts:AssumeRole
+          Principal:
+            Service: lambda.amazonaws.com
+          Effect: Allow
+      Policies:
+        - PolicyName: root
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: sqs:*
+                Resource: !GetAtt Queue.Arn
+              - Effect: Allow
+                Action: secretsmanager:GetSecretValue
+                Resource: !Ref EDLSecret
+              - Effect: Allow
+                Action: sns:Publish
+                Resource: !Ref IngestTopicArn
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: !Sub "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/*"
+
+  LambdaEventSourceMapping:
+    Type: AWS::Lambda::EventSourceMapping
+    Properties:
+      FunctionName: !Ref Lambda
+      EventSourceArn: !GetAtt Queue.Arn
+      FunctionResponseTypes:
+        - ReportBatchItemFailures
+
+  LambdaLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/${Lambda}"
+      RetentionInDays: 90
