@@ -6,8 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.1.2]
 
-### Added
-- Added a 10s delay to the queue to wait for hyp3 to add the job to the database
+### Fixed
+- Added a 10s delay to the queue to wait for hyp3 to add the job to the database. Fixes [#33](https://github.com/ASFHyP3/ingest-adapter/issues/33).
 
 ## [0.1.1]
 
