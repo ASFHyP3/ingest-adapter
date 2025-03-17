@@ -3,6 +3,6 @@
 mypy==1.15.0
 ruff==0.9.6
 pytest==8.3.4
-responses==0.25.6
-setuptools-scm==8.1.0
+responses==0.25.7
+setuptools-scm==8.2.0
 cfn-lint==1.25.1
