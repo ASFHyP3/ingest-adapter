@@ -32,7 +32,7 @@ suppress-dummy-args = true
 
 [tool.ruff.lint.extend-per-file-ignores]
 "*" = ["D1"]
-"tests/*" = ["ANN"]
+"tests/*" = ["D1", "ANN"]
 
 [tool.mypy]
 python_version = "3.13"
