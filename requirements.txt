@@ -5,4 +5,4 @@ ruff==0.11.8
 pytest==8.3.5
 responses==0.25.7
 setuptools-scm==8.2.0
-cfn-lint==1.34.0
+cfn-lint==1.34.2
