@@ -2,7 +2,7 @@
 -r plugin/requirements.txt
 mypy==1.16.1
 ruff==0.11.13
-pytest==8.4.0
+pytest==8.4.1
 responses==0.25.7
 setuptools-scm==8.3.1
 cfn-lint==1.36.1
