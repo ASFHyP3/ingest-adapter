@@ -125,3 +125,62 @@ def test_publish_message():
             TopicArn='arn:aws:sns:us-west-2:123456789012:myTopic',
             Message='{"ProductName": "bar"}',
         )
+
+
+def test_process_aria_s1_gunw(monkeypatch):
+    monkeypatch.setenv('CMR_DOMAIN', 'cmr.earthdata.nasa.gov')
+    monkeypatch.setenv('INGEST_TOPIC_ARN', 'myTopicArn')
+
+    now = datetime.datetime(2025, 2, 18, 1, 2, 3, 456)
+    mock_datetime = MagicMock(wraps=datetime.datetime)
+    mock_datetime.now.return_value = now
+    monkeypatch.setattr(datetime, 'datetime', mock_datetime)
+
+    job = {
+        'files': [
+            {
+                's3': {
+                    'bucket': 'myBucket',
+                    'key': 'myPrefix/myFilename.nc',
+                },
+            },
+        ],
+    }
+    expected_ingest_message = {
+        'ProductName': 'myFilename',
+        'DeliveryTime': '2025-02-18T01:02:03.000456',
+        'Browse': {
+            'Bucket': 'myBucket',
+            'Key': 'myPrefix/myFilename.png',
+        },
+        'Metadata': {
+            'Bucket': 'myBucket',
+            'Key': 'myPrefix/myFilename.json',
+        },
+        'Product': {
+            'Bucket': 'myBucket',
+            'Key': 'myPrefix/myFilename.nc',
+        },
+    }
+
+    with (
+        patch('aria_s1_gunw._exists_in_cmr') as mock_exists_in_cmr,
+        patch('aria_s1_gunw._publish_message') as mock_publish_message,
+    ):
+        mock_exists_in_cmr.return_value = False
+
+        aria_s1_gunw.process_aria_s1_gunw(job)
+
+        mock_exists_in_cmr.assert_called_once_with('cmr.earthdata.nasa.gov', 'myFilename')
+        mock_publish_message.assert_called_once_with(expected_ingest_message, 'myTopicArn')
+
+    with (
+        patch('aria_s1_gunw._exists_in_cmr') as mock_exists_in_cmr,
+        patch('aria_s1_gunw._publish_message') as mock_publish_message,
+    ):
+        mock_exists_in_cmr.return_value = True
+
+        aria_s1_gunw.process_aria_s1_gunw(job)
+
+        mock_exists_in_cmr.assert_called_once_with('cmr.earthdata.nasa.gov', 'myFilename')
+        mock_publish_message.assert_not_called()
