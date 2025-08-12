@@ -35,44 +35,20 @@ def test_get_job_dict():
         mock_hyp3.get_job_by_id.assert_called_once_with('abc123')
 
 
-# TODO: contains logic specific to ARIA_S1_GUNW; mock out process_aria_s1_gunw and test it separately?
-def test_process_message(monkeypatch):
-    monkeypatch.setenv('CMR_DOMAIN', 'cmr.earthdata.nasa.gov')
-    monkeypatch.setenv('INGEST_TOPIC_ARN', 'myTopicArn')
-    credentials = {
-        'username': 'myUsername',
-        'password': 'myPassword',
-    }
+def test_process_message_aria_s1_gunw():
+    job = {'job_type': 'ARIA_S1_GUNW'}
 
     with (
-        patch('app.get_job_dict', return_value={'job_type': 'ARIA_S1_GUNW'}) as get_job_dict,
-        patch(
-            'aria_s1_gunw._generate_ingest_message', return_value={'ProductName': 'foo'}
-        ) as mock_generate_ingest_message,
-        patch('aria_s1_gunw._exists_in_cmr', return_value=False) as mock_exists_in_cmr,
-        patch('aria_s1_gunw._publish_message') as mock_publish_message,
+        patch('app.get_job_dict', return_value=job) as mock_get_job_dict,
+        patch('aria_s1_gunw.process_aria_s1_gunw') as mock_process_aria_s1_gunw,
     ):
-        app.process_message({'hyp3_url': 'https://foo.com', 'job_id': 'abc123'}, credentials)
+        app.process_message(
+            {'hyp3_url': 'https://foo.com', 'job_id': 'abc123'},
+            {'username': 'myUsername', 'password': 'myPassword'},
+        )
 
-        get_job_dict.assert_called_once_with('https://foo.com', 'myUsername', 'myPassword', 'abc123')
-        mock_generate_ingest_message.assert_called_once_with({'job_type': 'ARIA_S1_GUNW'})
-        mock_exists_in_cmr.assert_called_once_with('cmr.earthdata.nasa.gov', 'foo')
-        mock_publish_message.assert_called_once_with({'ProductName': 'foo'}, 'myTopicArn')
-
-    with (
-        patch('app.get_job_dict', return_value={'job_type': 'ARIA_S1_GUNW'}) as get_job_dict,
-        patch(
-            'aria_s1_gunw._generate_ingest_message', return_value={'ProductName': 'bar'}
-        ) as mock_generate_ingest_message,
-        patch('aria_s1_gunw._exists_in_cmr', return_value=True) as mock_exists_in_cmr,
-        patch('aria_s1_gunw._publish_message') as mock_publish_message,
-    ):
-        app.process_message({'hyp3_url': 'https://bar.com', 'job_id': 'def456'}, credentials)
-
-        get_job_dict.assert_called_once_with('https://bar.com', 'myUsername', 'myPassword', 'def456')
-        mock_generate_ingest_message.assert_called_once_with({'job_type': 'ARIA_S1_GUNW'})
-        mock_exists_in_cmr.assert_called_once_with('cmr.earthdata.nasa.gov', 'bar')
-        mock_publish_message.assert_not_called()
+        mock_get_job_dict.assert_called_once_with('https://foo.com', 'myUsername', 'myPassword', 'abc123')
+        mock_process_aria_s1_gunw.assert_called_once_with(job)
 
 
 def test_process_message_unsupported_job_type():
