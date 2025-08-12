@@ -164,22 +164,18 @@ def test_process_aria_s1_gunw(monkeypatch):
     }
 
     with (
-        patch('aria_s1_gunw._exists_in_cmr') as mock_exists_in_cmr,
+        patch('aria_s1_gunw._exists_in_cmr', return_value=False) as mock_exists_in_cmr,
         patch('aria_s1_gunw._publish_message') as mock_publish_message,
     ):
-        mock_exists_in_cmr.return_value = False
-
         aria_s1_gunw.process_aria_s1_gunw(job)
 
         mock_exists_in_cmr.assert_called_once_with('cmr.earthdata.nasa.gov', 'myFilename')
         mock_publish_message.assert_called_once_with(expected_ingest_message, 'myTopicArn')
 
     with (
-        patch('aria_s1_gunw._exists_in_cmr') as mock_exists_in_cmr,
+        patch('aria_s1_gunw._exists_in_cmr', return_value=True) as mock_exists_in_cmr,
         patch('aria_s1_gunw._publish_message') as mock_publish_message,
     ):
-        mock_exists_in_cmr.return_value = True
-
         aria_s1_gunw.process_aria_s1_gunw(job)
 
         mock_exists_in_cmr.assert_called_once_with('cmr.earthdata.nasa.gov', 'myFilename')
