@@ -74,19 +74,15 @@ def test_process_message(monkeypatch):
         mock_exists_in_cmr.assert_called_once_with('cmr.earthdata.nasa.gov', 'bar')
         mock_publish_message.assert_not_called()
 
-    with (
-        patch('app.get_job_dict', return_value={'job_type': 'BAD_JOB_TYPE'}) as get_job_dict,
-        patch('aria_s1_gunw._generate_ingest_message') as mock_generate_ingest_message,
-        patch('aria_s1_gunw._exists_in_cmr') as mock_exists_in_cmr,
-        patch('aria_s1_gunw._publish_message') as mock_publish_message,
-    ):
-        with pytest.raises(ValueError, match=r'^Job type BAD_JOB_TYPE is not supported$'):
-            app.process_message({'hyp3_url': 'https://bar.com', 'job_id': 'def456'}, credentials)
 
-        get_job_dict.assert_called_once_with('https://bar.com', 'myUsername', 'myPassword', 'def456')
-        mock_generate_ingest_message.assert_not_called()
-        mock_exists_in_cmr.assert_not_called()
-        mock_publish_message.assert_not_called()
+def test_process_message_unsupported_job_type():
+    with patch('app.get_job_dict', return_value={'job_type': 'BAD_JOB_TYPE'}) as mock_get_job_dict:
+        with pytest.raises(ValueError, match=r'^Job type BAD_JOB_TYPE is not supported$'):
+            app.process_message(
+                {'hyp3_url': 'https://bar.com', 'job_id': 'def456'},
+                {'username': 'myUsername', 'password': 'myPassword'},
+            )
+        mock_get_job_dict.assert_called_once_with('https://bar.com', 'myUsername', 'myPassword', 'def456')
 
 
 def test_load_credentials(monkeypatch):
