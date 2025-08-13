@@ -20,6 +20,8 @@ inputs:
     required: true
   CMR_DOMAIN:
     required: true
+  HYP3_CONTENT_BUCKET:
+    required: true
 
 runs:
   using: composite
@@ -57,4 +59,5 @@ runs:
               Hyp3AccountIds='${{ inputs.HYP3_ACCOUNT_IDS }}' \
               EarthdataUsername='${{ inputs.EARTHDATA_USERNAME }}' \
               EarthdataPassword='${{ inputs.EARTHDATA_PASSWORD }}' \
-              CmrDomain='${{ inputs.CMR_DOMAIN }}'
+              CmrDomain='${{ inputs.CMR_DOMAIN }}' \
+              HyP3ContentBucket='${{ inputs.HYP3_CONTENT_BUCKET }}'

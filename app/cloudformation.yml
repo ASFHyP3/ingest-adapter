@@ -20,6 +20,9 @@ Parameters:
       - cmr.earthdata.nasa.gov
       - cmr.uat.earthdata.nasa.gov
 
+  HyP3ContentBucket:
+    Type: String
+
 Resources:
   PublishTopic:
     Type: AWS::SNS::Topic
@@ -88,6 +91,7 @@ Resources:
           SECRET_ARN: !Ref EDLSecret
           INGEST_TOPIC_ARN: !Ref IngestTopicArn
           CMR_DOMAIN: !Ref CmrDomain
+          HYP3_CONTENT_BUCKET: !Ref HyP3ContentBucket
 
   EDLSecret:
     Type: AWS::SecretsManager::Secret

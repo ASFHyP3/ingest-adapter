@@ -25,5 +25,6 @@ jobs:
           INGEST_TOPIC_ARN: ${{ secrets.INGEST_TOPIC_ARN }}
           HYP3_ACCOUNT_IDS: ${{ secrets.HYP3_ACCOUNT_IDS }}
           CMR_DOMAIN: cmr.earthdata.nasa.gov
+          HYP3_CONTENT_BUCKET: hyp3-opera-prod-contentbucket-2ypbtzzskwyr
           TEMPLATE_BUCKET: cf-templates-118mtzosmrltk-us-west-2
           APP_STACK_NAME: ingest-adapter-prod
