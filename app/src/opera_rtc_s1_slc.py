@@ -1,5 +1,5 @@
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 import boto3
@@ -9,8 +9,8 @@ s3 = boto3.client('s3')
 sqs = boto3.client('sqs')
 
 
-QUEUE_URL = '' # TODO
-BUCKET = '' # TODO
+QUEUE_URL = ''  # TODO
+BUCKET = ''  # TODO
 
 
 def get_products(bucket: str, job: dict) -> list[dict]:
@@ -29,10 +29,13 @@ def get_products(bucket: str, job: dict) -> list[dict]:
                     'size': obj['Size'],
                     'checksum': obj['ETag'].strip('"'),
                     'checksumType': 'md5',
-                } for obj in response['Contents'] if product_name in obj['Key']
+                }
+                for obj in response['Contents']
+                if product_name in obj['Key']
             ],
             'dataVersion': '1.0',
-        } for product_name in product_names
+        }
+        for product_name in product_names
     ]
 
 
@@ -52,7 +55,7 @@ def get_message(product: dict) -> dict:
         'identifier': product['name'],
         'collection': 'OPERA_L2_RTC-S1_V1',
         'version': '1.6.1',
-        'submissionTime': datetime.now(tz=timezone.utc).isoformat().replace('+00:00', 'Z'),
+        'submissionTime': datetime.now(tz=UTC).isoformat().replace('+00:00', 'Z'),
         'product': product,
         'provider': 'HyP3',
         'trace': 'ASF-TOOLS',
