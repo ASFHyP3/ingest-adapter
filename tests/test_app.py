@@ -40,7 +40,7 @@ def test_process_message_aria_s1_gunw():
 
     with (
         patch('app.get_job_dict', return_value=job) as mock_get_job_dict,
-        patch('aria_s1_gunw.process_aria_s1_gunw') as mock_process_aria_s1_gunw,
+        patch('aria_s1_gunw.process_job') as mock_process_job,
     ):
         app.process_message(
             {'hyp3_url': 'https://foo.com', 'job_id': 'abc123'},
@@ -48,7 +48,7 @@ def test_process_message_aria_s1_gunw():
         )
 
         mock_get_job_dict.assert_called_once_with('https://foo.com', 'myUsername', 'myPassword', 'abc123')
-        mock_process_aria_s1_gunw.assert_called_once_with(job)
+        mock_process_job.assert_called_once_with(job)
 
 
 def test_process_message_unsupported_job_type():

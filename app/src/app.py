@@ -20,7 +20,7 @@ def process_message(message: dict, edl_credentials: dict) -> None:
 
     match job['job_type']:
         case 'ARIA_S1_GUNW':
-            aria_s1_gunw.process_aria_s1_gunw(job)
+            aria_s1_gunw.process_job(job)
         case _:
             raise ValueError(f'Job type {job["job_type"]} is not supported')
 

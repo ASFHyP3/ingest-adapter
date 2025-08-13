@@ -59,7 +59,7 @@ def _publish_message(message: dict, topic_arn: str) -> None:
     )
 
 
-def process_aria_s1_gunw(job: dict) -> None:
+def process_job(job: dict) -> None:
     ingest_message = _generate_ingest_message(job)
     if not _exists_in_cmr(os.environ['CMR_DOMAIN'], ingest_message['ProductName']):
         _publish_message(ingest_message, os.environ['INGEST_TOPIC_ARN'])

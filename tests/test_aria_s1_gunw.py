@@ -127,7 +127,7 @@ def test_publish_message():
         )
 
 
-def test_process_aria_s1_gunw(monkeypatch):
+def test_process_job(monkeypatch):
     monkeypatch.setenv('CMR_DOMAIN', 'cmr.earthdata.nasa.gov')
     monkeypatch.setenv('INGEST_TOPIC_ARN', 'myTopicArn')
 
@@ -167,7 +167,7 @@ def test_process_aria_s1_gunw(monkeypatch):
         patch('aria_s1_gunw._exists_in_cmr', return_value=False) as mock_exists_in_cmr,
         patch('aria_s1_gunw._publish_message') as mock_publish_message,
     ):
-        aria_s1_gunw.process_aria_s1_gunw(job)
+        aria_s1_gunw.process_job(job)
 
         mock_exists_in_cmr.assert_called_once_with('cmr.earthdata.nasa.gov', 'myFilename')
         mock_publish_message.assert_called_once_with(expected_ingest_message, 'myTopicArn')
@@ -176,7 +176,7 @@ def test_process_aria_s1_gunw(monkeypatch):
         patch('aria_s1_gunw._exists_in_cmr', return_value=True) as mock_exists_in_cmr,
         patch('aria_s1_gunw._publish_message') as mock_publish_message,
     ):
-        aria_s1_gunw.process_aria_s1_gunw(job)
+        aria_s1_gunw.process_job(job)
 
         mock_exists_in_cmr.assert_called_once_with('cmr.earthdata.nasa.gov', 'myFilename')
         mock_publish_message.assert_not_called()
