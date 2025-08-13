@@ -13,7 +13,7 @@ QUEUE_URL = ''  # TODO
 BUCKET = ''  # TODO
 
 
-def get_products(bucket: str, job: dict) -> list[dict]:
+def _get_products(bucket: str, job: dict) -> list[dict]:
     response = s3.list_objects_v2(Bucket=bucket, Prefix=job['job_id'])
 
     product_names = {Path(obj['Key']).stem for obj in response['Contents'] if obj['Key'].endswith('.h5')}
@@ -24,7 +24,7 @@ def get_products(bucket: str, job: dict) -> list[dict]:
             'files': [
                 {
                     'name': Path(obj['Key']).name,
-                    'type': get_file_type(obj['Key']),
+                    'type': _get_file_type(obj['Key']),
                     'uri': f's3://{bucket}/{obj["Key"]}',
                     'size': obj['Size'],
                     'checksum': obj['ETag'].strip('"'),
@@ -39,7 +39,7 @@ def get_products(bucket: str, job: dict) -> list[dict]:
     ]
 
 
-def get_file_type(key: str) -> str:
+def _get_file_type(key: str) -> str:
     if key.endswith('.tif') or key.endswith('.h5'):
         return 'data'
     elif key.endswith('.png'):
@@ -50,7 +50,7 @@ def get_file_type(key: str) -> str:
         raise ValueError(f'Could not determine file type for {key}')
 
 
-def get_message(product: dict) -> dict:
+def _get_message(product: dict) -> dict:
     return {
         'identifier': product['name'],
         'collection': 'OPERA_L2_RTC-S1_V1',
@@ -62,12 +62,12 @@ def get_message(product: dict) -> dict:
     }
 
 
-def send_messages(queue_url: str, messages: list[dict]) -> None:
+def _send_messages(queue_url: str, messages: list[dict]) -> None:
     for message in messages:
         sqs.send_message(QueueUrl=queue_url, MessageBody=json.dumps(message))
 
 
 def process_job(job: dict) -> None:
-    products = get_products(BUCKET, job)
-    messages = [get_message(product) for product in products]
-    send_messages(QUEUE_URL, messages)
+    products = _get_products(BUCKET, job)
+    messages = [_get_message(product) for product in products]
+    _send_messages(QUEUE_URL, messages)
