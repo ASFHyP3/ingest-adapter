@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.2.0]
 
 ### Added
-- Ingest `OPERA_RTC_S1_SLC` jobs if they do not already exist in CMR.
+- Publish `OPERA_RTC_S1_SLC` jobs for ingest if they do not already exist in CMR.
 
 ## [0.1.2]
 
