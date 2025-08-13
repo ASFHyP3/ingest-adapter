@@ -7,7 +7,7 @@ import boto3
 
 
 s3 = boto3.client('s3')
-sqs = boto3.client('sqs')
+sqs = boto3.client('sqs')  # TODO: botocore.exceptions.NoRegionError: You must specify a region
 
 
 def _get_products(bucket: str, job: dict) -> list[dict]:
