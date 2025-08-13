@@ -65,6 +65,6 @@ def send_messages(queue_url: str, messages: list[dict]) -> None:
 
 
 def process_job(job_id: str) -> None:
-    products = get_products(job_id)
+    products = get_products(BUCKET, job_id)
     messages = [get_message(product) for product in products]
     send_messages(QUEUE_URL, messages)
