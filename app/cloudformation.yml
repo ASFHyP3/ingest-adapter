@@ -23,6 +23,9 @@ Parameters:
   HyP3ContentBucket:
     Type: String
 
+  QueueUrl:
+    Type: String
+
 Resources:
   PublishTopic:
     Type: AWS::SNS::Topic
@@ -92,6 +95,7 @@ Resources:
           INGEST_TOPIC_ARN: !Ref IngestTopicArn
           CMR_DOMAIN: !Ref CmrDomain
           HYP3_CONTENT_BUCKET: !Ref HyP3ContentBucket
+          QUEUE_URL: !Ref QueueUrl
 
   EDLSecret:
     Type: AWS::SecretsManager::Secret

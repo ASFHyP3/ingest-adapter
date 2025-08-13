@@ -10,9 +10,6 @@ s3 = boto3.client('s3')
 sqs = boto3.client('sqs')
 
 
-QUEUE_URL = ''  # TODO
-
-
 def _get_products(bucket: str, job: dict) -> list[dict]:
     response = s3.list_objects_v2(Bucket=bucket, Prefix=job['job_id'])
 
@@ -70,4 +67,4 @@ def _send_messages(queue_url: str, messages: list[dict]) -> None:
 def process_job(job: dict) -> None:
     products = _get_products(os.environ['HYP3_CONTENT_BUCKET'], job)
     messages = [_get_message(product) for product in products]
-    _send_messages(QUEUE_URL, messages)
+    _send_messages(os.environ['QUEUE_URL'], messages)

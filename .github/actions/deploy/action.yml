@@ -60,4 +60,5 @@ runs:
               EarthdataUsername='${{ inputs.EARTHDATA_USERNAME }}' \
               EarthdataPassword='${{ inputs.EARTHDATA_PASSWORD }}' \
               CmrDomain='${{ inputs.CMR_DOMAIN }}' \
-              HyP3ContentBucket='${{ inputs.HYP3_CONTENT_BUCKET }}'
+              HyP3ContentBucket='${{ inputs.HYP3_CONTENT_BUCKET }}' \
+              QueueUrl='${{ inputs.QUEUE_URL }}'
