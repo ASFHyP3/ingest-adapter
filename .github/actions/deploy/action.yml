@@ -22,6 +22,8 @@ inputs:
     required: true
   HYP3_CONTENT_BUCKET:
     required: true
+  QUEUE_URL:
+    required: true
 
 runs:
   using: composite
