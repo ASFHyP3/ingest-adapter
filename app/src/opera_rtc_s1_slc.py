@@ -9,12 +9,12 @@ s3 = boto3.client('s3')
 sqs = boto3.client('sqs')
 
 
-QUEUE_URL = ''
-BUCKET = ''
+QUEUE_URL = '' # TODO
+BUCKET = '' # TODO
 
 
-def get_products(bucket: str, job_id: str) -> list[dict]:
-    response = s3.list_objects_v2(Bucket=bucket, Prefix=job_id)
+def get_products(bucket: str, job: dict) -> list[dict]:
+    response = s3.list_objects_v2(Bucket=bucket, Prefix=job['job_id'])
 
     product_names = {Path(obj['Key']).stem for obj in response['Contents'] if obj['Key'].endswith('.h5')}
 
@@ -64,7 +64,7 @@ def send_messages(queue_url: str, messages: list[dict]) -> None:
         sqs.send_message(QueueUrl=queue_url, MessageBody=json.dumps(message))
 
 
-def process_job(job_id: str) -> None:
-    products = get_products(BUCKET, job_id)
+def process_job(job: dict) -> None:
+    products = get_products(BUCKET, job)
     messages = [get_message(product) for product in products]
     send_messages(QUEUE_URL, messages)
