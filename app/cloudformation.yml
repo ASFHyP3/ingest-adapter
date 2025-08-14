@@ -20,6 +20,12 @@ Parameters:
       - cmr.earthdata.nasa.gov
       - cmr.uat.earthdata.nasa.gov
 
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+
+  SubnetIds:
+    Type: List<AWS::EC2::Subnet::Id>
+
 Resources:
   PublishTopic:
     Type: AWS::SNS::Topic
@@ -74,6 +80,12 @@ Resources:
       Queues:
         - !Ref Queue
 
+  SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: !Sub "Security group for ${AWS::StackName} resources"
+      VpcId: !Ref VpcId
+
   Lambda:
     Type: AWS::Lambda::Function
     Properties:
@@ -83,6 +95,10 @@ Resources:
       Role: !GetAtt LambdaRole.Arn
       Runtime: python3.13
       Timeout: 300
+      VpcConfig:
+        SecurityGroupIds:
+          - !Ref SecurityGroup
+        SubnetIds: !Ref SubnetIds
       Environment:
         Variables:
           SECRET_ARN: !Ref EDLSecret
@@ -105,6 +121,8 @@ Resources:
           Principal:
             Service: lambda.amazonaws.com
           Effect: Allow
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole
       Policies:
         - PolicyName: root
           PolicyDocument:
