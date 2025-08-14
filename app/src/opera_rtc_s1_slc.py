@@ -4,32 +4,16 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 import boto3
-import requests
+
+import util
 
 
 s3 = boto3.client('s3')
 sqs = boto3.client('sqs')  # TODO: botocore.exceptions.NoRegionError: You must specify a region
 
 
-def _get_granule_ur_pattern(granule_ur: str) -> str:
+def _granule_ur_pattern(granule_ur: str) -> str:
     return f'{granule_ur[:49]}*{granule_ur[64:]}'
-
-
-# TODO: factor out util function and use for both aria and opera?
-def _exists_in_cmr(cmr_domain: str, granule_ur: str) -> bool:
-    url = f'https://{cmr_domain}/search/granules.umm_json'
-    params = (
-        ('short_name', 'OPERA_L2_RTC-S1_V1'),
-        ('granule_ur', _get_granule_ur_pattern(granule_ur)),
-        ('options[granule_ur][pattern]', 'true'),
-        ('page_size', 1),
-    )
-    response = requests.get(url, params=params)
-    response.raise_for_status()
-    if response.json()['items']:
-        print(f'{granule_ur} already exists in CMR as {response.json()["items"][0]["umm"]["GranuleUR"]}')
-        return True
-    return False
 
 
 def _get_products(bucket: str, job: dict) -> list[dict]:
@@ -89,6 +73,8 @@ def _send_messages(queue_url: str, messages: list[dict]) -> None:
 def process_job(job: dict) -> None:
     products = _get_products(os.environ['HYP3_CONTENT_BUCKET'], job)
     messages = [
-        _get_message(product) for product in products if _exists_in_cmr(os.environ['CMR_DOMAIN'], product['name'])
+        _get_message(product)
+        for product in products
+        if util.exists_in_cmr(os.environ['CMR_DOMAIN'], 'OPERA_L2_RTC-S1_V1', product['name'], _granule_ur_pattern)
     ]
     _send_messages(os.environ['QUEUE_URL'], messages)

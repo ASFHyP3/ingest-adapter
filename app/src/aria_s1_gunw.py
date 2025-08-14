@@ -4,27 +4,12 @@ import os
 import pathlib
 
 import boto3
-import requests
+
+import util
 
 
-def _get_granule_ur_pattern(granule_ur: str) -> str:
+def _granule_ur_pattern(granule_ur: str) -> str:
     return granule_ur.rsplit('-', 1)[0] + '-*'
-
-
-def _exists_in_cmr(cmr_domain: str, granule_ur: str) -> bool:
-    url = f'https://{cmr_domain}/search/granules.umm_json'
-    params = (
-        ('short_name', 'ARIA_S1_GUNW'),
-        ('granule_ur', _get_granule_ur_pattern(granule_ur)),
-        ('options[granule_ur][pattern]', 'true'),
-        ('page_size', 1),
-    )
-    response = requests.get(url, params=params)
-    response.raise_for_status()
-    if response.json()['items']:
-        print(f'{granule_ur} already exists in CMR as {response.json()["items"][0]["umm"]["GranuleUR"]}')
-        return True
-    return False
 
 
 def _generate_ingest_message(hyp3_job_dict: dict) -> dict:
@@ -61,5 +46,7 @@ def _publish_message(message: dict, topic_arn: str) -> None:
 
 def process_job(job: dict) -> None:
     ingest_message = _generate_ingest_message(job)
-    if not _exists_in_cmr(os.environ['CMR_DOMAIN'], ingest_message['ProductName']):
+    if not util.exists_in_cmr(
+        os.environ['CMR_DOMAIN'], 'ARIA_S1_GUNW', ingest_message['ProductName'], _granule_ur_pattern
+    ):
         _publish_message(ingest_message, os.environ['INGEST_TOPIC_ARN'])
