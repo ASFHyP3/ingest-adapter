@@ -4,10 +4,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.2.0]
+## [0.3.0]
 
 ### Added
 - Publish `OPERA_RTC_S1_SLC` jobs for ingest if they do not already exist in CMR.
+
+## [0.2.0]
+
+### Changed
+- Application lambda is now deployed inside a VPC to support interacting with private HyP3 APIs.
+- Move application code specific to handling the `ARIA_S1_GUNW` job type into a separate `aria_s1_gunw` module.
+
+### Fixed
+- Upgrade to [Actions v0.20.0](https://github.com/ASFHyP3/actions/releases/tag/v0.20.0). Addresses https://github.com/ASFHyP3/actions/issues/278
 
 ## [0.1.2]
 
