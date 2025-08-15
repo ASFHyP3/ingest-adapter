@@ -14,6 +14,13 @@ def s3_stubber():
         stubber.assert_no_pending_responses()
 
 
+@pytest.fixture(autouse=True)
+def sqs_stubber():
+    with Stubber(opera_rtc_s1_slc.sqs) as stubber:
+        yield stubber
+        stubber.assert_no_pending_responses()
+
+
 def test_granule_ur_pattern():
     payload = 'OPERA_L2_RTC-S1_T075-160101-IW2_20250813T204041Z_20250813T235131Z_S1A_30_v1.0'
     output = 'OPERA_L2_RTC-S1_T075-160101-IW2_20250813T204041Z_*Z_S1A_30_v1.0'
@@ -177,8 +184,31 @@ def test_get_message(monkeypatch):
     mock_datetime.now.assert_called_once_with(tz=datetime.UTC)
 
 
-def test_send_messages():
-    assert False
+def test_send_messages(sqs_stubber):
+    sqs_stubber.add_response(
+        method='send_message',
+        expected_params={
+            'QueueUrl': 'myQueue',
+            'MessageBody': '{"foo": "bar"}',
+        },
+        service_response={},
+    )
+    sqs_stubber.add_response(
+        method='send_message',
+        expected_params={
+            'QueueUrl': 'myQueue',
+            'MessageBody': '{"hello": "world"}',
+        },
+        service_response={},
+    )
+
+    opera_rtc_s1_slc._send_messages(
+        queue_url='myQueue',
+        messages=[
+            {'foo': 'bar'},
+            {'hello': 'world'},
+        ],
+    )
 
 
 def test_process_job():
