@@ -146,6 +146,12 @@ Resources:
                 Action: sns:Publish
                 Resource: !Ref IngestTopicArn
               - Effect: Allow
+                Action: sqs:SendMessage
+                Resource: arn:aws:sqs:*
+              - Effect: Allow
+                Action: s3:ListBucket
+                Resource: !Sub "arn:aws:s3:::${HyP3ContentBucket}"
+              - Effect: Allow
                 Action:
                   - logs:CreateLogStream
                   - logs:PutLogEvents
