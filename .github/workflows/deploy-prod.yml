@@ -27,3 +27,5 @@ jobs:
           CMR_DOMAIN: cmr.earthdata.nasa.gov
           TEMPLATE_BUCKET: cf-templates-118mtzosmrltk-us-west-2
           APP_STACK_NAME: ingest-adapter-prod
+          VPC_ID: ${{ secrets.VPC_ID }}
+          SUBNET_IDS: ${{ secrets.SUBNET_IDS }}

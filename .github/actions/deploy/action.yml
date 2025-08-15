@@ -20,6 +20,10 @@ inputs:
     required: true
   CMR_DOMAIN:
     required: true
+  VPC_ID:
+    required: true
+  SUBNET_IDS:
+    required: true
 
 runs:
   using: composite
@@ -57,4 +61,6 @@ runs:
               Hyp3AccountIds='${{ inputs.HYP3_ACCOUNT_IDS }}' \
               EarthdataUsername='${{ inputs.EARTHDATA_USERNAME }}' \
               EarthdataPassword='${{ inputs.EARTHDATA_PASSWORD }}' \
-              CmrDomain='${{ inputs.CMR_DOMAIN }}'
+              CmrDomain='${{ inputs.CMR_DOMAIN }}' \
+              VpcId='${{ inputs.VPC_ID }}' \
+              SubnetIds='${{ inputs.SUBNET_IDS }}'
