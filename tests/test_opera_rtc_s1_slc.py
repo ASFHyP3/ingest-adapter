@@ -218,7 +218,7 @@ def test_process_job(monkeypatch):
         assert granule_ur_pattern is opera_rtc_s1_slc._granule_ur_pattern
 
         assert granule_ur in ('product1', 'product2', 'product3')
-        return granule_ur in ('product1', 'product3')
+        return granule_ur  == 'product2'
 
     monkeypatch.setenv('CMR_DOMAIN', 'test-cmr-domain')
     monkeypatch.setenv('HYP3_CONTENT_BUCKET', 'test-bucket')
