@@ -8,10 +8,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Application lambda is now deployed inside a VPC to support interacting with private HyP3 APIs.
-
-## [0.1.3]
-
-### Changed
 - Move application code specific to handling the `ARIA_S1_GUNW` job type into a separate `aria_s1_gunw` module.
 
 ## [0.1.2]
