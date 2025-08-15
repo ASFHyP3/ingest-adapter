@@ -264,5 +264,5 @@ def test_process_job(monkeypatch):
             call(tz=datetime.UTC),
             call(tz=datetime.UTC),
         ]
-        mock_get_products.assert_called_once_with('test-bucket', job)
+        mock_get_products.assert_called_once_with('test-bucket', 'test-job')
         mock_send_messages.assert_called_once_with('test-queue-url', expected_messages)
