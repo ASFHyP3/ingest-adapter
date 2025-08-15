@@ -20,6 +20,12 @@ Parameters:
       - cmr.earthdata.nasa.gov
       - cmr.uat.earthdata.nasa.gov
 
+  HyP3ContentBucket:
+    Type: String
+
+  QueueUrl:
+    Type: String
+
   VpcId:
     Type: AWS::EC2::VPC::Id
 
@@ -104,6 +110,8 @@ Resources:
           SECRET_ARN: !Ref EDLSecret
           INGEST_TOPIC_ARN: !Ref IngestTopicArn
           CMR_DOMAIN: !Ref CmrDomain
+          HYP3_CONTENT_BUCKET: !Ref HyP3ContentBucket
+          QUEUE_URL: !Ref QueueUrl
 
   EDLSecret:
     Type: AWS::SecretsManager::Secret
@@ -137,6 +145,12 @@ Resources:
               - Effect: Allow
                 Action: sns:Publish
                 Resource: !Ref IngestTopicArn
+              - Effect: Allow
+                Action: sqs:SendMessage
+                Resource: arn:aws:sqs:*
+              - Effect: Allow
+                Action: s3:ListBucket
+                Resource: !Sub "arn:aws:s3:::${HyP3ContentBucket}"
               - Effect: Allow
                 Action:
                   - logs:CreateLogStream

@@ -6,6 +6,7 @@ import boto3
 import hyp3_sdk
 
 import aria_s1_gunw
+import opera_rtc_s1_slc
 
 
 def get_job_dict(hyp3_url: str, username: str, password: str, job_id: str) -> dict:
@@ -21,6 +22,8 @@ def process_message(message: dict, edl_credentials: dict) -> None:
     match job['job_type']:
         case 'ARIA_S1_GUNW':
             aria_s1_gunw.process_job(job)
+        case 'OPERA_RTC_S1_SLC':
+            opera_rtc_s1_slc.process_job(job)
         case _:
             raise ValueError(f'Job type {job["job_type"]} is not supported')
 

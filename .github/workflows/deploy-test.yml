@@ -23,8 +23,10 @@ jobs:
           EARTHDATA_USERNAME: ${{ secrets.EARTHDATA_USERNAME }}
           EARTHDATA_PASSWORD: ${{ secrets.EARTHDATA_PASSWORD }}
           INGEST_TOPIC_ARN: ${{ secrets.INGEST_TOPIC_ARN }}
+          QUEUE_URL: ${{ secrets.QUEUE_URL }}
           HYP3_ACCOUNT_IDS: ${{ secrets.HYP3_ACCOUNT_IDS }}
           CMR_DOMAIN: cmr.uat.earthdata.nasa.gov
+          HYP3_CONTENT_BUCKET: hyp3-opera-uat-contentbucket-hnb0kgwnsc0b
           TEMPLATE_BUCKET: cf-templates-118ylv0o6jp2n-us-west-2
           APP_STACK_NAME: ingest-adapter-test
           VPC_ID: ${{ secrets.VPC_ID }}

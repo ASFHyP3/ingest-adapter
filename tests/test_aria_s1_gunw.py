@@ -1,68 +1,17 @@
 import datetime
 from unittest.mock import MagicMock, patch
 
-import responses
-
 import aria_s1_gunw
 
 
-def test_get_granule_ur_pattern():
+def test_granule_ur_pattern():
     granule_ur = 'S1-GUNW-D-R-036-tops-20250131_20241226-041630-00025E_00035N-PP-99eb-v3_0_1'
     expected = 'S1-GUNW-D-R-036-tops-20250131_20241226-041630-00025E_00035N-PP-99eb-*'
-    assert aria_s1_gunw._get_granule_ur_pattern(granule_ur) == expected
+    assert aria_s1_gunw._granule_ur_pattern(granule_ur) == expected
 
     granule_ur = 'S1-GUNW-D-R-123-tops-20230605_20230512-032645-00038E_00036N-PP-f518-v3_0_0'
     expected = 'S1-GUNW-D-R-123-tops-20230605_20230512-032645-00038E_00036N-PP-f518-*'
-    assert aria_s1_gunw._get_granule_ur_pattern(granule_ur) == expected
-
-
-@responses.activate
-def test_exists_in_cmr():
-    responses.get(
-        'https://cmr.earthdata.nasa.gov/search/granules.umm_json',
-        status=200,
-        match=[
-            responses.matchers.query_param_matcher(
-                {
-                    'short_name': 'ARIA_S1_GUNW',
-                    'granule_ur': 'S1-GUNW-D-R-036-tops-20250131_20241226-041630-00025E_00035N-PP-99eb-*',
-                    'options[granule_ur][pattern]': 'true',
-                    'page_size': 1,
-                },
-            ),
-        ],
-        json={
-            'items': [
-                {
-                    'umm': {
-                        'GranuleUR': 'myGranule',
-                    },
-                },
-            ],
-        },
-    )
-    granule_ur = 'S1-GUNW-D-R-036-tops-20250131_20241226-041630-00025E_00035N-PP-99eb-v3_0_1'
-    assert aria_s1_gunw._exists_in_cmr('cmr.earthdata.nasa.gov', granule_ur)
-
-    responses.get(
-        'https://cmr.uat.earthdata.nasa.gov/search/granules.umm_json',
-        status=200,
-        match=[
-            responses.matchers.query_param_matcher(
-                {
-                    'short_name': 'ARIA_S1_GUNW',
-                    'granule_ur': 'S1-GUNW-D-R-123-tops-20230605_20230512-032645-00038E_00036N-PP-f518-*',
-                    'options[granule_ur][pattern]': 'true',
-                    'page_size': 1,
-                },
-            ),
-        ],
-        json={
-            'items': [],
-        },
-    )
-    granule_ur = 'S1-GUNW-D-R-123-tops-20230605_20230512-032645-00038E_00036N-PP-f518-v3_0_0'
-    assert not aria_s1_gunw._exists_in_cmr('cmr.uat.earthdata.nasa.gov', granule_ur)
+    assert aria_s1_gunw._granule_ur_pattern(granule_ur) == expected
 
 
 def test_generate_ingest_message(monkeypatch):
@@ -164,19 +113,23 @@ def test_process_job(monkeypatch):
     }
 
     with (
-        patch('aria_s1_gunw._exists_in_cmr', return_value=False) as mock_exists_in_cmr,
+        patch('util.exists_in_cmr', return_value=False) as mock_exists_in_cmr,
         patch('aria_s1_gunw._publish_message') as mock_publish_message,
     ):
         aria_s1_gunw.process_job(job)
 
-        mock_exists_in_cmr.assert_called_once_with('cmr.earthdata.nasa.gov', 'myFilename')
+        mock_exists_in_cmr.assert_called_once_with(
+            'cmr.earthdata.nasa.gov', 'ARIA_S1_GUNW', 'myFilename', aria_s1_gunw._granule_ur_pattern
+        )
         mock_publish_message.assert_called_once_with(expected_ingest_message, 'myTopicArn')
 
     with (
-        patch('aria_s1_gunw._exists_in_cmr', return_value=True) as mock_exists_in_cmr,
+        patch('util.exists_in_cmr', return_value=True) as mock_exists_in_cmr,
         patch('aria_s1_gunw._publish_message') as mock_publish_message,
     ):
         aria_s1_gunw.process_job(job)
 
-        mock_exists_in_cmr.assert_called_once_with('cmr.earthdata.nasa.gov', 'myFilename')
+        mock_exists_in_cmr.assert_called_once_with(
+            'cmr.earthdata.nasa.gov', 'ARIA_S1_GUNW', 'myFilename', aria_s1_gunw._granule_ur_pattern
+        )
         mock_publish_message.assert_not_called()
