@@ -1,5 +1,5 @@
 import datetime
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, call, patch
 
 import pytest
 
@@ -55,5 +55,58 @@ def test_send_messages():
     assert False
 
 
-def test_process_job():
-    assert False
+def test_process_job(monkeypatch):
+    def mock_exists_in_cmr(cmr_domain, short_name, granule_ur, granule_ur_pattern):
+        assert cmr_domain == 'test-cmr-domain'
+        assert short_name == 'OPERA_L2_RTC-S1_V1'
+        assert granule_ur_pattern is opera_rtc_s1_slc._granule_ur_pattern
+
+        assert granule_ur in ('product1', 'product2', 'product3')
+        return granule_ur in ('product1', 'product3')
+
+    monkeypatch.setenv('CMR_DOMAIN', 'test-cmr-domain')
+    monkeypatch.setenv('HYP3_CONTENT_BUCKET', 'test-bucket')
+    monkeypatch.setenv('QUEUE_URL', 'test-queue-url')
+
+    now = datetime.datetime(2025, 2, 18, 1, 2, 3, 456, tzinfo=datetime.UTC)
+    mock_datetime = MagicMock(wraps=datetime.datetime)
+    mock_datetime.now.return_value = now
+    monkeypatch.setattr(datetime, 'datetime', mock_datetime)
+
+    job = {'job_id': 'test-job'}
+    expected_messages = [
+        {
+            'identifier': 'product1',
+            'collection': 'OPERA_L2_RTC-S1_V1',
+            'version': '1.6.1',
+            'submissionTime': '2025-02-18T01:02:03.000456Z',
+            'product': {'name': 'product1'},
+            'provider': 'HyP3',
+            'trace': 'ASF-TOOLS',
+        },
+        {
+            'identifier': 'product3',
+            'collection': 'OPERA_L2_RTC-S1_V1',
+            'version': '1.6.1',
+            'submissionTime': '2025-02-18T01:02:03.000456Z',
+            'product': {'name': 'product3'},
+            'provider': 'HyP3',
+            'trace': 'ASF-TOOLS',
+        },
+    ]
+    with (
+        patch(
+            'opera_rtc_s1_slc._get_products',
+            return_value=[{'name': 'product1'}, {'name': 'product2'}, {'name': 'product3'}],
+        ) as mock_get_products,
+        patch('util.exists_in_cmr', mock_exists_in_cmr),
+        patch('opera_rtc_s1_slc._send_messages') as mock_send_messages,
+    ):
+        opera_rtc_s1_slc.process_job(job)
+
+        assert mock_datetime.now.mock_calls == [
+            call(tz=datetime.UTC),
+            call(tz=datetime.UTC),
+        ]
+        mock_get_products.assert_called_once_with('test-bucket', job)
+        mock_send_messages.assert_called_once_with('test-queue-url', expected_messages)
