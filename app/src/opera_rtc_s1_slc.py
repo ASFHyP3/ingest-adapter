@@ -67,6 +67,7 @@ def _get_message(product: dict) -> dict:
 
 def _send_messages(queue_url: str, messages: list[dict]) -> None:
     for message in messages:
+        print(f'Publishing {message["identifier"]} to {queue_url}')
         sqs.send_message(QueueUrl=queue_url, MessageBody=json.dumps(message))
 
 
