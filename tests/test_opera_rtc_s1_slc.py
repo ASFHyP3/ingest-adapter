@@ -1,3 +1,6 @@
+import datetime
+from unittest.mock import MagicMock
+
 import pytest
 
 import opera_rtc_s1_slc
@@ -30,8 +33,22 @@ def test_get_file_type():
         assert opera_rtc_s1_slc._get_file_type('bad_file.zip')
 
 
-def test_get_message():
-    assert False
+def test_get_message(monkeypatch):
+    now = datetime.datetime(2025, 2, 18, 1, 2, 3, 456, tzinfo=datetime.UTC)
+    mock_datetime = MagicMock(wraps=datetime.datetime)
+    mock_datetime.now.return_value = now
+    monkeypatch.setattr(datetime, 'datetime', mock_datetime)
+
+    assert opera_rtc_s1_slc._get_message({'name': 'test-product'}) == {
+        'identifier': 'test-product',
+        'collection': 'OPERA_L2_RTC-S1_V1',
+        'version': '1.6.1',
+        'submissionTime': '2025-02-18T01:02:03.000456Z',
+        'product': {'name': 'test-product'},
+        'provider': 'HyP3',
+        'trace': 'ASF-TOOLS',
+    }
+    mock_datetime.now.assert_called_once_with(tz=datetime.UTC)
 
 
 def test_send_messages():

@@ -1,6 +1,6 @@
+import datetime
 import json
 import os
-from datetime import UTC, datetime
 from pathlib import Path
 
 import boto3
@@ -58,7 +58,7 @@ def _get_message(product: dict) -> dict:
         'identifier': product['name'],
         'collection': 'OPERA_L2_RTC-S1_V1',
         'version': '1.6.1',
-        'submissionTime': datetime.now(tz=UTC).isoformat().replace('+00:00', 'Z'),
+        'submissionTime': datetime.datetime.now(tz=datetime.UTC).isoformat().replace('+00:00', 'Z'),
         'product': product,
         'provider': 'HyP3',
         'trace': 'ASF-TOOLS',
