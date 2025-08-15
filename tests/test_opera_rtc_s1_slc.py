@@ -189,7 +189,7 @@ def test_send_messages(sqs_stubber):
         method='send_message',
         expected_params={
             'QueueUrl': 'myQueue',
-            'MessageBody': '{"foo": "bar"}',
+            'MessageBody': '{"identifier": "foo"}',
         },
         service_response={},
     )
@@ -197,7 +197,7 @@ def test_send_messages(sqs_stubber):
         method='send_message',
         expected_params={
             'QueueUrl': 'myQueue',
-            'MessageBody': '{"hello": "world"}',
+            'MessageBody': '{"identifier": "bar"}',
         },
         service_response={},
     )
@@ -205,8 +205,8 @@ def test_send_messages(sqs_stubber):
     opera_rtc_s1_slc._send_messages(
         queue_url='myQueue',
         messages=[
-            {'foo': 'bar'},
-            {'hello': 'world'},
+            {'identifier': 'foo'},
+            {'identifier': 'bar'},
         ],
     )
 
