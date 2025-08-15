@@ -26,5 +26,5 @@ jobs:
       - shell: bash -l {0}
         run: |
           export PYTHONPATH=${PWD}/app/src:${PWD}/plugin/src
-          export AWS_REGION=us-west-2
+          export AWS_DEFAULT_REGION=us-west-2
           pytest tests
