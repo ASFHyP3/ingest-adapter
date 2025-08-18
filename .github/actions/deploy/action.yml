@@ -20,6 +20,10 @@ inputs:
     required: true
   CMR_DOMAIN:
     required: true
+  HYP3_CONTENT_BUCKET:
+    required: true
+  QUEUE_URL:
+    required: true
   VPC_ID:
     required: true
   SUBNET_IDS:
@@ -62,5 +66,7 @@ runs:
               EarthdataUsername='${{ inputs.EARTHDATA_USERNAME }}' \
               EarthdataPassword='${{ inputs.EARTHDATA_PASSWORD }}' \
               CmrDomain='${{ inputs.CMR_DOMAIN }}' \
+              HyP3ContentBucket='${{ inputs.HYP3_CONTENT_BUCKET }}' \
+              QueueUrl='${{ inputs.QUEUE_URL }}' \
               VpcId='${{ inputs.VPC_ID }}' \
               SubnetIds='${{ inputs.SUBNET_IDS }}'
