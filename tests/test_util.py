@@ -50,6 +50,4 @@ def test_exists_in_cmr():
         },
     )
     granule_ur = 'S1-GUNW-D-R-123-tops-20230605_20230512-032645-00038E_00036N-PP-f518-v3_0_0'
-    assert not util.exists_in_cmr(
-        'cmr.uat.earthdata.nasa.gov', 'ARIA_S1_GUNW', granule_ur, gunw._granule_ur_pattern
-    )
+    assert not util.exists_in_cmr('cmr.uat.earthdata.nasa.gov', 'ARIA_S1_GUNW', granule_ur, gunw._granule_ur_pattern)
