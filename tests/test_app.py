@@ -40,7 +40,7 @@ def test_process_message_aria_s1_gunw():
 
     with (
         patch('app.get_job_dict', return_value=job) as mock_get_job_dict,
-        patch('aria_s1_gunw.process_job') as mock_process_job,
+        patch('gunw.process_job') as mock_process_job,
     ):
         app.process_message(
             {'hyp3_url': 'https://foo.com', 'job_id': 'abc123'},

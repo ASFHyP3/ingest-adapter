@@ -5,7 +5,7 @@ import traceback
 import boto3
 import hyp3_sdk
 
-import aria_s1_gunw
+import gunw
 import opera_rtc_s1_slc
 
 
@@ -20,8 +20,8 @@ def process_message(message: dict, edl_credentials: dict) -> None:
     job = get_job_dict(message['hyp3_url'], username, password, message['job_id'])
 
     match job['job_type']:
-        case 'ARIA_S1_GUNW':
-            aria_s1_gunw.process_job(job)
+        case 'ARIA_S1_GUNW': # TODO add additional job types
+            gunw.process_job(job)
         case 'OPERA_RTC_S1_SLC':
             opera_rtc_s1_slc.process_job(job)
         case _:

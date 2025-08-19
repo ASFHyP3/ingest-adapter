@@ -1,17 +1,17 @@
 import datetime
 from unittest.mock import MagicMock, patch
 
-import aria_s1_gunw
+import gunw
 
 
 def test_granule_ur_pattern():
     granule_ur = 'S1-GUNW-D-R-036-tops-20250131_20241226-041630-00025E_00035N-PP-99eb-v3_0_1'
     expected = 'S1-GUNW-D-R-036-tops-20250131_20241226-041630-00025E_00035N-PP-99eb-*'
-    assert aria_s1_gunw._granule_ur_pattern(granule_ur) == expected
+    assert gunw._granule_ur_pattern(granule_ur) == expected
 
     granule_ur = 'S1-GUNW-D-R-123-tops-20230605_20230512-032645-00038E_00036N-PP-f518-v3_0_0'
     expected = 'S1-GUNW-D-R-123-tops-20230605_20230512-032645-00038E_00036N-PP-f518-*'
-    assert aria_s1_gunw._granule_ur_pattern(granule_ur) == expected
+    assert gunw._granule_ur_pattern(granule_ur) == expected
 
 
 def test_generate_ingest_message(monkeypatch):
@@ -47,7 +47,7 @@ def test_generate_ingest_message(monkeypatch):
     mock_datetime.now.return_value = now
     monkeypatch.setattr(datetime, 'datetime', mock_datetime)
 
-    assert aria_s1_gunw._generate_ingest_message(job) == expected
+    assert gunw._generate_ingest_message(job) == expected
 
 
 def test_publish_message():
@@ -55,7 +55,7 @@ def test_publish_message():
         mock_sns = MagicMock()
         mock_client.return_value = mock_sns
 
-        aria_s1_gunw._publish_message({'ProductName': 'foo'}, 'arn:aws:sns:us-east-1:123456789012:myTopic')
+        gunw._publish_message({'ProductName': 'foo'}, 'arn:aws:sns:us-east-1:123456789012:myTopic')
 
         mock_client.assert_called_once_with('sns', region_name='us-east-1')
         mock_sns.publish.assert_called_once_with(
@@ -67,7 +67,7 @@ def test_publish_message():
         mock_sns = MagicMock()
         mock_client.return_value = mock_sns
 
-        aria_s1_gunw._publish_message({'ProductName': 'bar'}, 'arn:aws:sns:us-west-2:123456789012:myTopic')
+        gunw._publish_message({'ProductName': 'bar'}, 'arn:aws:sns:us-west-2:123456789012:myTopic')
 
         mock_client.assert_called_once_with('sns', region_name='us-west-2')
         mock_sns.publish.assert_called_once_with(
@@ -114,22 +114,22 @@ def test_process_job(monkeypatch):
 
     with (
         patch('util.exists_in_cmr', return_value=False) as mock_exists_in_cmr,
-        patch('aria_s1_gunw._publish_message') as mock_publish_message,
+        patch('gunw._publish_message') as mock_publish_message,
     ):
-        aria_s1_gunw.process_job(job)
+        gunw.process_job(job)
 
         mock_exists_in_cmr.assert_called_once_with(
-            'cmr.earthdata.nasa.gov', 'ARIA_S1_GUNW', 'myFilename', aria_s1_gunw._granule_ur_pattern
+            'cmr.earthdata.nasa.gov', 'ARIA_S1_GUNW', 'myFilename', gunw._granule_ur_pattern
         )
         mock_publish_message.assert_called_once_with(expected_ingest_message, 'myTopicArn')
 
     with (
         patch('util.exists_in_cmr', return_value=True) as mock_exists_in_cmr,
-        patch('aria_s1_gunw._publish_message') as mock_publish_message,
+        patch('gunw._publish_message') as mock_publish_message,
     ):
-        aria_s1_gunw.process_job(job)
+        gunw.process_job(job)
 
         mock_exists_in_cmr.assert_called_once_with(
-            'cmr.earthdata.nasa.gov', 'ARIA_S1_GUNW', 'myFilename', aria_s1_gunw._granule_ur_pattern
+            'cmr.earthdata.nasa.gov', 'ARIA_S1_GUNW', 'myFilename', gunw._granule_ur_pattern
         )
         mock_publish_message.assert_not_called()
