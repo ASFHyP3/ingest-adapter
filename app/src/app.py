@@ -20,7 +20,7 @@ def process_message(message: dict, edl_credentials: dict) -> None:
     job = get_job_dict(message['hyp3_url'], username, password, message['job_id'])
 
     match job['job_type']:
-        case 'ARIA_S1_GUNW': # TODO add additional job types
+        case 'ARIA_S1_GUNW' | 'INSAR_ISCE' | 'ARIA_RAIDER':
             gunw.process_job(job)
         case 'OPERA_RTC_S1_SLC':
             opera_rtc_s1_slc.process_job(job)

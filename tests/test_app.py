@@ -51,6 +51,38 @@ def test_process_message_aria_s1_gunw():
         mock_process_job.assert_called_once_with(job)
 
 
+def test_process_message_insar_isce():
+    job = {'job_type': 'INSAR_ISCE'}
+
+    with (
+        patch('app.get_job_dict', return_value=job) as mock_get_job_dict,
+        patch('gunw.process_job') as mock_process_job,
+    ):
+        app.process_message(
+            {'hyp3_url': 'https://foo.com', 'job_id': 'abc123'},
+            {'username': 'myUsername', 'password': 'myPassword'},
+        )
+
+        mock_get_job_dict.assert_called_once_with('https://foo.com', 'myUsername', 'myPassword', 'abc123')
+        mock_process_job.assert_called_once_with(job)
+
+
+def test_process_message_aria_raider():
+    job = {'job_type': 'ARIA_RAIDER'}
+
+    with (
+        patch('app.get_job_dict', return_value=job) as mock_get_job_dict,
+        patch('gunw.process_job') as mock_process_job,
+    ):
+        app.process_message(
+            {'hyp3_url': 'https://foo.com', 'job_id': 'abc123'},
+            {'username': 'myUsername', 'password': 'myPassword'},
+        )
+
+        mock_get_job_dict.assert_called_once_with('https://foo.com', 'myUsername', 'myPassword', 'abc123')
+        mock_process_job.assert_called_once_with(job)
+
+
 def test_process_message_opera_rtc_s1_slc():
     job = {'job_type': 'OPERA_RTC_S1_SLC'}
 
