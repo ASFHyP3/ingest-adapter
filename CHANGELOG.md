@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0]
+
+### Added
+- Handle `INSAR_ISCE` and `ARIA_RAIDER` jobs in the same manner as `ARIA_S1_GUNW` jobs. Replaces the functionality of https://github.com/ASFHyP3/cloud-based-insar-operations
+
+### Changed
+- Rename the `aria_s1_gunw` module to `gunw`.
+
+### Removed
+- Remove the `DeliveryTime` field from the ingest message published for GUNW job types. This field is ignored as of [GRFN Ingest v3.0.0](https://github.com/asfadmin/grfn-ingest/releases/tag/v3.0.0).
+
 ## [0.3.0]
 
 ### Added
