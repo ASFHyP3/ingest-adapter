@@ -1,4 +1,3 @@
-import datetime
 from unittest.mock import MagicMock, patch
 
 import gunw
@@ -27,7 +26,6 @@ def test_generate_ingest_message(monkeypatch):
     }
     expected = {
         'ProductName': 'myFilename',
-        'DeliveryTime': '2025-02-18T01:02:03.000456',
         'Browse': {
             'Bucket': 'myBucket',
             'Key': 'myPrefix/myFilename.png',
@@ -41,11 +39,6 @@ def test_generate_ingest_message(monkeypatch):
             'Key': 'myPrefix/myFilename.nc',
         },
     }
-
-    now = datetime.datetime(2025, 2, 18, 1, 2, 3, 456)
-    mock_datetime = MagicMock(wraps=datetime.datetime)
-    mock_datetime.now.return_value = now
-    monkeypatch.setattr(datetime, 'datetime', mock_datetime)
 
     assert gunw._generate_ingest_message(job) == expected
 
@@ -80,11 +73,6 @@ def test_process_job(monkeypatch):
     monkeypatch.setenv('CMR_DOMAIN', 'cmr.earthdata.nasa.gov')
     monkeypatch.setenv('INGEST_TOPIC_ARN', 'myTopicArn')
 
-    now = datetime.datetime(2025, 2, 18, 1, 2, 3, 456)
-    mock_datetime = MagicMock(wraps=datetime.datetime)
-    mock_datetime.now.return_value = now
-    monkeypatch.setattr(datetime, 'datetime', mock_datetime)
-
     job = {
         'files': [
             {
@@ -97,7 +85,6 @@ def test_process_job(monkeypatch):
     }
     expected_ingest_message = {
         'ProductName': 'myFilename',
-        'DeliveryTime': '2025-02-18T01:02:03.000456',
         'Browse': {
             'Bucket': 'myBucket',
             'Key': 'myPrefix/myFilename.png',

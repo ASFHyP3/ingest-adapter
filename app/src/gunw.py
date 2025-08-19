@@ -1,4 +1,3 @@
-import datetime
 import json
 import os
 import pathlib
@@ -18,7 +17,6 @@ def _generate_ingest_message(hyp3_job_dict: dict) -> dict:
 
     return {
         'ProductName': product_key.stem,
-        'DeliveryTime': datetime.datetime.now(tz=datetime.UTC).replace(tzinfo=None).isoformat(), # TODO delete
         'Browse': {
             'Bucket': bucket,
             'Key': str(product_key.with_suffix('.png')),
