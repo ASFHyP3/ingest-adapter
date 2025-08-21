@@ -61,7 +61,6 @@ def _publish_message(message: dict, topic_arn: str) -> None:
     )
 
 
-# TODO tests
 def _qualifies_for_ingest(job: dict, hyp3_url: str) -> bool:
     job_type, user_id = job['job_type'], job['user_id']
     config: JobTypeConfig = JOB_TYPE_CONFIGS[job_type]
