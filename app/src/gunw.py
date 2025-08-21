@@ -6,7 +6,6 @@ from dataclasses import dataclass
 import boto3
 
 import util
-from exceptions import SkipIngestError
 
 
 @dataclass(frozen=True)
