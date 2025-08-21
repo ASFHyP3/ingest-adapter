@@ -63,22 +63,25 @@ def _publish_message(message: dict, topic_arn: str) -> None:
 
 
 # TODO tests
-def _validate_job(job: dict, hyp3_url: str) -> None:
+def _qualifies_for_ingest(job: dict, hyp3_url: str) -> bool:
     job_type, user_id = job['job_type'], job['user_id']
     config: JobTypeConfig = JOB_TYPE_CONFIGS[job_type]
 
     if config.hyp3_urls is not None and hyp3_url not in config.hyp3_urls:
-        raise SkipIngestError(f'Skipping ingest for {job} because HyP3 URL {hyp3_url} not in {config.hyp3_urls}')
+        print(f'Skipping ingest for {job} because HyP3 URL {hyp3_url} not in {config.hyp3_urls}')
+        return False
 
     if config.user_id is not None and user_id != config.user_id:
-        raise SkipIngestError(f'Skipping ingest for {job} because user {user_id} != {config.user_id}')
+        print(f'Skipping ingest for {job} because user {user_id} != {config.user_id}')
+        return False
+
+    return True
 
 
 def process_job(job: dict, hyp3_url: str) -> None:
-    _validate_job(job, hyp3_url)
-
-    ingest_message = _generate_ingest_message(job)
-    if not util.exists_in_cmr(
-        os.environ['CMR_DOMAIN'], 'ARIA_S1_GUNW', ingest_message['ProductName'], _granule_ur_pattern
-    ):
-        _publish_message(ingest_message, os.environ['INGEST_TOPIC_ARN'])
+    if _qualifies_for_ingest(job, hyp3_url):
+        ingest_message = _generate_ingest_message(job)
+        if not util.exists_in_cmr(
+            os.environ['CMR_DOMAIN'], 'ARIA_S1_GUNW', ingest_message['ProductName'], _granule_ur_pattern
+        ):
+            _publish_message(ingest_message, os.environ['INGEST_TOPIC_ARN'])
