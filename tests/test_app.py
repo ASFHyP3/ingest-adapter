@@ -48,7 +48,7 @@ def test_process_message_aria_s1_gunw():
         )
 
         mock_get_job_dict.assert_called_once_with('https://foo.com', 'myUsername', 'myPassword', 'abc123')
-        mock_process_job.assert_called_once_with(job)
+        mock_process_job.assert_called_once_with(job, 'https://foo.com')
 
 
 def test_process_message_insar_isce():
@@ -64,7 +64,7 @@ def test_process_message_insar_isce():
         )
 
         mock_get_job_dict.assert_called_once_with('https://foo.com', 'myUsername', 'myPassword', 'abc123')
-        mock_process_job.assert_called_once_with(job)
+        mock_process_job.assert_called_once_with(job, 'https://foo.com')
 
 
 def test_process_message_aria_raider():
@@ -80,7 +80,7 @@ def test_process_message_aria_raider():
         )
 
         mock_get_job_dict.assert_called_once_with('https://foo.com', 'myUsername', 'myPassword', 'abc123')
-        mock_process_job.assert_called_once_with(job)
+        mock_process_job.assert_called_once_with(job, 'https://foo.com')
 
 
 def test_process_message_opera_rtc_s1_slc():

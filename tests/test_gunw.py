@@ -74,6 +74,8 @@ def test_process_job(monkeypatch):
     monkeypatch.setenv('INGEST_TOPIC_ARN', 'myTopicArn')
 
     job = {
+        'job_type': 'ARIA_S1_GUNW',
+        'user_id': 'test-user',
         'files': [
             {
                 's3': {
@@ -103,7 +105,7 @@ def test_process_job(monkeypatch):
         patch('util.exists_in_cmr', return_value=False) as mock_exists_in_cmr,
         patch('gunw._publish_message') as mock_publish_message,
     ):
-        gunw.process_job(job)
+        gunw.process_job(job, 'https://foo.com')
 
         mock_exists_in_cmr.assert_called_once_with(
             'cmr.earthdata.nasa.gov', 'ARIA_S1_GUNW', 'myFilename', gunw._granule_ur_pattern
@@ -114,7 +116,7 @@ def test_process_job(monkeypatch):
         patch('util.exists_in_cmr', return_value=True) as mock_exists_in_cmr,
         patch('gunw._publish_message') as mock_publish_message,
     ):
-        gunw.process_job(job)
+        gunw.process_job(job, 'https://foo.com')
 
         mock_exists_in_cmr.assert_called_once_with(
             'cmr.earthdata.nasa.gov', 'ARIA_S1_GUNW', 'myFilename', gunw._granule_ur_pattern
