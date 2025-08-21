@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.4.0]
 
 ### Added
-- Handle `INSAR_ISCE` and `ARIA_RAIDER` jobs in the same manner as `ARIA_S1_GUNW` jobs. Replaces the functionality of https://github.com/ASFHyP3/cloud-based-insar-operations
+- Publish `INSAR_ISCE` and `ARIA_RAIDER` jobs to the `ARIA_S1_GUNW` CMR collection. Replaces the functionality of https://github.com/ASFHyP3/cloud-based-insar-operations
 
 ### Changed
 - Rename the `aria_s1_gunw` module to `gunw`.
