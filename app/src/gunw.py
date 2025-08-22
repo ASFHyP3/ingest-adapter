@@ -9,9 +9,9 @@ import util
 
 
 @dataclass(frozen=True)
-class JobTypeConfig:
-    hyp3_urls: list[str] | None = None
-    user_id: str | None = None
+class JobTypeIngestConfig:
+    hyp3_urls: list[str]
+    user_id: str
 
 
 GUNW_USERNAME = 'access_cloud_based_insar'
@@ -20,9 +20,9 @@ TIBET_URL = 'https://hyp3-tibet-jpl.asf.alaska.edu'
 
 
 JOB_TYPE_CONFIGS = {
-    'ARIA_S1_GUNW': JobTypeConfig(),
-    'INSAR_ISCE': JobTypeConfig(hyp3_urls=[A19_URL, TIBET_URL], user_id=GUNW_USERNAME),
-    'ARIA_RAIDER': JobTypeConfig(hyp3_urls=[A19_URL], user_id=GUNW_USERNAME),
+    'ARIA_S1_GUNW': None,
+    'INSAR_ISCE': JobTypeIngestConfig(hyp3_urls=[A19_URL, TIBET_URL], user_id=GUNW_USERNAME),
+    'ARIA_RAIDER': JobTypeIngestConfig(hyp3_urls=[A19_URL], user_id=GUNW_USERNAME),
 }
 
 
@@ -62,14 +62,16 @@ def _publish_message(message: dict, topic_arn: str) -> None:
 
 
 def _qualifies_for_ingest(job: dict, hyp3_url: str) -> bool:
-    job_type, user_id = job['job_type'], job['user_id']
-    config: JobTypeConfig = JOB_TYPE_CONFIGS[job_type]
+    config = JOB_TYPE_CONFIGS[job['job_type']]
 
-    if config.hyp3_urls is not None and hyp3_url not in config.hyp3_urls:
+    if config is None:
+        return True
+
+    if hyp3_url not in config.hyp3_urls:
         print(f'Skipping ingest for {job} because HyP3 URL {hyp3_url} not in {config.hyp3_urls}')
         return False
 
-    if config.user_id is not None and user_id != config.user_id:
+    if (user_id := job['user_id']) != config.user_id:
         print(f'Skipping ingest for {job} because user {user_id} != {config.user_id}')
         return False
 
