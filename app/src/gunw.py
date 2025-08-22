@@ -62,17 +62,17 @@ def _publish_message(message: dict, topic_arn: str) -> None:
 
 
 def _qualifies_for_ingest(job: dict, hyp3_url: str) -> bool:
-    config = INGEST_CONFIGS[job['job_type']]
+    ingest_config = INGEST_CONFIGS[job['job_type']]
 
-    if config is None:
+    if ingest_config is None:
         return True
 
-    if hyp3_url not in config.hyp3_urls:
-        print(f'Skipping ingest for {job} because HyP3 URL {hyp3_url} not in {config.hyp3_urls}')
+    if hyp3_url not in ingest_config.hyp3_urls:
+        print(f'Skipping ingest for {job} because HyP3 URL {hyp3_url} not in {ingest_config.hyp3_urls}')
         return False
 
-    if (user_id := job['user_id']) != config.user_id:
-        print(f'Skipping ingest for {job} because user {user_id} != {config.user_id}')
+    if (user_id := job['user_id']) != ingest_config.user_id:
+        print(f'Skipping ingest for {job} because user {user_id} != {ingest_config.user_id}')
         return False
 
     return True
