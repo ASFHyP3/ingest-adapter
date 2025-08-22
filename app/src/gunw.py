@@ -19,7 +19,7 @@ A19_URL = 'https://hyp3-a19-jpl.asf.alaska.edu'
 TIBET_URL = 'https://hyp3-tibet-jpl.asf.alaska.edu'
 
 
-JOB_TYPE_CONFIGS = {
+INGEST_CONFIGS = {
     'ARIA_S1_GUNW': None,
     'INSAR_ISCE': JobTypeIngestConfig(hyp3_urls=[A19_URL, TIBET_URL], user_id=GUNW_USERNAME),
     'ARIA_RAIDER': JobTypeIngestConfig(hyp3_urls=[A19_URL], user_id=GUNW_USERNAME),
@@ -62,7 +62,7 @@ def _publish_message(message: dict, topic_arn: str) -> None:
 
 
 def _qualifies_for_ingest(job: dict, hyp3_url: str) -> bool:
-    config = JOB_TYPE_CONFIGS[job['job_type']]
+    config = INGEST_CONFIGS[job['job_type']]
 
     if config is None:
         return True
