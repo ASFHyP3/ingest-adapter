@@ -4,7 +4,7 @@ An application for publishing HyP3 output products for ingest into ASF's data ca
 It contains a HyP3 plugin and an application for publishing jobs sent to it from the HyP3 plugin.
 
 Support is currently limited to:
-- Publishing the outputs of `ARIA_S1_GUNW` jobs to the `ARIA_S1_GUNW` CMR collection
+- Publishing the outputs of `ARIA_S1_GUNW`, `INSAR_ISCE`, and `ARIA_RAIDER` jobs to the `ARIA_S1_GUNW` CMR collection
 - Publishing the outputs of `OPERA_RTC_S1_SLC` jobs to the `OPERA_L2_RTC-S1_V1` CMR collection
 
 ## Usage
