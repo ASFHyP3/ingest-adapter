@@ -1,7 +1,7 @@
 -r app/requirements.txt
 -r plugin/requirements.txt
 mypy==1.17.1
-ruff==0.12.9
+ruff==0.12.10
 pytest==8.4.1
 responses==0.25.8
 setuptools-scm==9.2.0
