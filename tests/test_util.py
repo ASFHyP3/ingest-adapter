@@ -1,6 +1,6 @@
 import responses
 
-import aria_s1_gunw
+import gunw
 import util
 
 
@@ -30,7 +30,7 @@ def test_exists_in_cmr():
         },
     )
     granule_ur = 'S1-GUNW-D-R-036-tops-20250131_20241226-041630-00025E_00035N-PP-99eb-v3_0_1'
-    assert util.exists_in_cmr('cmr.earthdata.nasa.gov', 'ARIA_S1_GUNW', granule_ur, aria_s1_gunw._granule_ur_pattern)
+    assert util.exists_in_cmr('cmr.earthdata.nasa.gov', 'ARIA_S1_GUNW', granule_ur, gunw._granule_ur_pattern)
 
     responses.get(
         'https://cmr.uat.earthdata.nasa.gov/search/granules.umm_json',
@@ -50,6 +50,4 @@ def test_exists_in_cmr():
         },
     )
     granule_ur = 'S1-GUNW-D-R-123-tops-20230605_20230512-032645-00038E_00036N-PP-f518-v3_0_0'
-    assert not util.exists_in_cmr(
-        'cmr.uat.earthdata.nasa.gov', 'ARIA_S1_GUNW', granule_ur, aria_s1_gunw._granule_ur_pattern
-    )
+    assert not util.exists_in_cmr('cmr.uat.earthdata.nasa.gov', 'ARIA_S1_GUNW', granule_ur, gunw._granule_ur_pattern)
