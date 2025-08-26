@@ -178,7 +178,7 @@ def test_get_message(monkeypatch):
         'version': '1.6.1',
         'submissionTime': '2025-02-18T01:02:03.000456Z',
         'product': {'name': 'test-product'},
-        'provider': 'HyP3',
+        'provider': 'ASF_HyP3',
         'trace': 'ASF-TOOLS',
     }
     mock_datetime.now.assert_called_once_with(tz=datetime.UTC)
@@ -237,7 +237,7 @@ def test_process_job(monkeypatch):
             'version': '1.6.1',
             'submissionTime': '2025-02-18T01:02:03.000456Z',
             'product': {'name': 'product1'},
-            'provider': 'HyP3',
+            'provider': 'ASF_HyP3',
             'trace': 'ASF-TOOLS',
         },
         {
@@ -246,7 +246,7 @@ def test_process_job(monkeypatch):
             'version': '1.6.1',
             'submissionTime': '2025-02-18T01:02:03.000456Z',
             'product': {'name': 'product3'},
-            'provider': 'HyP3',
+            'provider': 'ASF_HyP3',
             'trace': 'ASF-TOOLS',
         },
     ]
