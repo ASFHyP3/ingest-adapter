@@ -60,7 +60,7 @@ def _get_message(product: dict) -> dict:
         'version': '1.6.1',
         'submissionTime': datetime.datetime.now(tz=datetime.UTC).isoformat().replace('+00:00', 'Z'),
         'product': product,
-        'provider': 'HyP3',
+        'provider': 'ASF_HyP3',
         'trace': 'ASF-TOOLS',
     }
 
