@@ -214,36 +214,70 @@ def test_process_job_if_not_archived(monkeypatch, s3_bucket, gunw_data_path):
         ('ARIA_RAIDER', GUNW_USERNAME, 'https://foo.com', False),
     ],
 )
-def test_process_job_if_qualifies(monkeypatch, job_type: str, user_id: str, hyp3_url: str, expected_to_qualify: bool):
+def test_process_job_if_qualifies(s3_bucket, gunw_data_path, monkeypatch, job_type: str, user_id: str, hyp3_url: str, expected_to_qualify: bool):
     monkeypatch.setenv('CMR_DOMAIN', 'cmr.earthdata.nasa.gov')
     monkeypatch.setenv('GUNW_QUEUE_URL', 'myQueueUrl')
 
+    aws.S3_CLIENT.upload_file(str(gunw_data_path / 'metadata.json'), s3_bucket, 'myPrefix/myFilename.json')
+    aws.S3_CLIENT.upload_file(str(gunw_data_path / 'browse.png'), s3_bucket, 'myPrefix/myFilename.png')
+    aws.S3_CLIENT.upload_file(str(gunw_data_path / 'data.nc'), s3_bucket, 'myPrefix/myFilename.nc')
+
+    now = datetime.datetime(2025, 2, 18, 1, 2, 3, 456, tzinfo=datetime.UTC)
+    mock_datetime = MagicMock(wraps=datetime.datetime)
+    mock_datetime.now.return_value = now
+    monkeypatch.setattr(datetime, 'datetime', mock_datetime)
+
     job = {
+        'job_id': 'myPrefix',
         'job_type': job_type,
         'user_id': user_id,
         'files': [
             {
                 's3': {
-                    'bucket': 'myBucket',
+                    'bucket': s3_bucket,
                     'key': 'myPrefix/myFilename.nc',
                 },
             },
         ],
     }
+    product = {
+        'name': 'myFilename',
+        'files': [
+            {
+                'name': 'myFilename.json',
+                'type': 'metadata',
+                'uri': 's3://myBucket/myPrefix/myFilename.json',
+                'size': 2675,
+                'checksum': '3b938e3797b8d5a90728ff64f7209752',
+                'checksumType': 'md5',
+            },
+            {
+                'name': 'myFilename.nc',
+                'type': 'data',
+                'uri': 's3://myBucket/myPrefix/myFilename.nc',
+                'size': 0,
+                'checksum': 'd41d8cd98f00b204e9800998ecf8427e',
+                'checksumType': 'md5',
+            },
+            {
+                'name': 'myFilename.png',
+                'type': 'browse',
+                'uri': 's3://myBucket/myPrefix/myFilename.png',
+                'size': 737869,
+                'checksum': 'e5094bda56e2316f2ec71d708cf1b4e6',
+                'checksumType': 'md5',
+            },
+        ],
+        'dataVersion': '1.0',
+    }
     expected_ingest_message = {
-        'ProductName': 'myFilename',
-        'Browse': {
-            'Bucket': 'myBucket',
-            'Key': 'myPrefix/myFilename.png',
-        },
-        'Metadata': {
-            'Bucket': 'myBucket',
-            'Key': 'myPrefix/myFilename.json',
-        },
-        'Product': {
-            'Bucket': 'myBucket',
-            'Key': 'myPrefix/myFilename.nc',
-        },
+        'identifier': 'myFilename',
+        'collection': 'ARIA_S1_GUNW',
+        'version': '1.6.1',
+        'submissionTime': '2025-02-18T01:02:03.000456Z',
+        'product': product,
+        'provider': 'ASF_HyP3',
+        'trace': 'ASF-TOOLS',
     }
 
     with (
