@@ -214,7 +214,9 @@ def test_process_job_if_not_archived(monkeypatch, s3_bucket, gunw_data_path):
         ('ARIA_RAIDER', GUNW_USERNAME, 'https://foo.com', False),
     ],
 )
-def test_process_job_if_qualifies(s3_bucket, gunw_data_path, monkeypatch, job_type: str, user_id: str, hyp3_url: str, expected_to_qualify: bool):
+def test_process_job_if_qualifies(
+    s3_bucket, gunw_data_path, monkeypatch, job_type: str, user_id: str, hyp3_url: str, expected_to_qualify: bool
+):
     monkeypatch.setenv('CMR_DOMAIN', 'cmr.earthdata.nasa.gov')
     monkeypatch.setenv('GUNW_QUEUE_URL', 'myQueueUrl')
 

@@ -1,8 +1,8 @@
-from enum import StrEnum
+from enum import Enum
 from typing import TypedDict
 
 
-class Collection(StrEnum):
+class CmrCollection(Enum):
     ARIA_S1_GUNW = 'ARIA_S1_GUNW'
     OPERA_RTC_S1_SLC = 'OPERA_L2_RTC-S1_V1'
 
@@ -28,7 +28,7 @@ class IngestProduct(TypedDict):
 
 class IngestMessage(TypedDict):
     identifier: str
-    collection: Collection
+    collection: CmrCollection
     version: str
     submissionTime: str
     product: IngestProduct

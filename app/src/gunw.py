@@ -60,7 +60,7 @@ def _generate_ingest_message(hyp3_job_dict: dict) -> ingest_message.IngestMessag
 
     return {
         'identifier': product_name,
-        'collection': str(ingest_message.Collection.ARIA_S1_GUNW),
+        'collection': str(ingest_message.CmrCollection.ARIA_S1_GUNW.value),
         'version': '1.6.1',
         'submissionTime': util.get_submission_time(),
         'product': product,
@@ -96,6 +96,9 @@ def process_job(job: dict, hyp3_url: str) -> None:
     if _qualifies_for_ingest(job, hyp3_url):
         message = _generate_ingest_message(job)
         if not util.exists_in_cmr(
-            os.environ['CMR_DOMAIN'], str(ingest_message.Collection.ARIA_S1_GUNW), message['identifier'], _granule_ur_pattern
+            os.environ['CMR_DOMAIN'],
+            str(ingest_message.CmrCollection.ARIA_S1_GUNW.value),
+            message['identifier'],
+            _granule_ur_pattern,
         ):
             _publish_message(message, os.environ['GUNW_QUEUE_URL'])
