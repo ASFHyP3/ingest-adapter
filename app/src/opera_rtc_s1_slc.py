@@ -78,4 +78,4 @@ def process_job(job: dict) -> None:
         for product in products
         if not util.exists_in_cmr(os.environ['CMR_DOMAIN'], 'OPERA_L2_RTC-S1_V1', product['name'], _granule_ur_pattern)
     ]
-    _send_messages(os.environ['QUEUE_URL'], messages)
+    _send_messages(os.environ['OPERA_RTC_QUEUE_URL'], messages)
