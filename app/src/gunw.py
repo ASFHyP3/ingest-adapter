@@ -56,7 +56,7 @@ def _publish_message(message: dict, topic_arn: str) -> None:
     topic_region = topic_arn.split(':')[3]
     sqs = boto3.client('sqs', region_name=topic_region)
     sqs.send_message(
-        QueueUrl=topic_arn, #TODO Switch to URL
+        QueueUrl=topic_arn,  # TODO Switch to URL
         Message=json.dumps(message),
     )
 
