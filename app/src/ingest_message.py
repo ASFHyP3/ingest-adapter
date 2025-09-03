@@ -6,6 +6,7 @@ OPERA_RTC_COLLECTION = 'OPERA_L2_RTC-S1_V1'
 
 PROVIDER = 'ASF_HyP3'
 TRACE = 'ASF-TOOLS'
+CNM_SCHEMA_VERSION = '1.6.1'
 
 
 class IngestProductFile(TypedDict):

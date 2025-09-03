@@ -61,7 +61,7 @@ def _generate_ingest_message(hyp3_job_dict: dict) -> ingest_message.IngestMessag
     return {
         'identifier': product_name,
         'collection': ingest_message.ARIA_S1_GUNW_COLLECTION,
-        'version': '1.6.1',
+        'version': ingest_message.CNM_SCHEMA_VERSION,
         'submissionTime': util.get_submission_time(),
         'product': product,
         'provider': ingest_message.PROVIDER,

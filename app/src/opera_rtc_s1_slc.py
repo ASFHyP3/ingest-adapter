@@ -46,7 +46,7 @@ def _get_message(product: ingest_message.IngestProduct) -> ingest_message.Ingest
     return {
         'identifier': product['name'],
         'collection': ingest_message.OPERA_RTC_COLLECTION,
-        'version': '1.6.1',
+        'version': ingest_message.CNM_SCHEMA_VERSION,
         'submissionTime': util.get_submission_time(),
         'product': product,
         'provider': ingest_message.PROVIDER,
