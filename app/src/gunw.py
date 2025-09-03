@@ -54,9 +54,9 @@ def _generate_ingest_message(hyp3_job_dict: dict) -> dict:
 def _publish_message(message: dict, topic_arn: str) -> None:
     print(f'Publishing {message["ProductName"]} to {topic_arn}')
     topic_region = topic_arn.split(':')[3]
-    sns = boto3.client('sns', region_name=topic_region)
-    sns.publish(
-        TopicArn=topic_arn,
+    sqs = boto3.client('sqs', region_name=topic_region)
+    sqs.send_message(
+        QueueUrl=topic_arn, #TODO Switch to URL
         Message=json.dumps(message),
     )
 
