@@ -60,7 +60,7 @@ def _generate_ingest_message(hyp3_job_dict: dict) -> ingest_message.IngestMessag
 
     return {
         'identifier': product_name,
-        'collection': ingest_message.CmrCollection.ARIA_S1_GUNW.value,
+        'collection': ingest_message.ARIA_S1_GUNW_COLLECTION,
         'version': '1.6.1',
         'submissionTime': util.get_submission_time(),
         'product': product,
@@ -70,7 +70,7 @@ def _generate_ingest_message(hyp3_job_dict: dict) -> ingest_message.IngestMessag
 
 
 # TODO: consider moving to util (since it's copy-pasted from opera_rtc)
-def _publish_message(message: dict, queue_url: str) -> None:
+def _publish_message(message: ingest_message.IngestMessage, queue_url: str) -> None:
     print(f'Publishing {message["identifier"]} to {queue_url}')
     sqs.send_message(QueueUrl=queue_url, MessageBody=json.dumps(message))
 
@@ -97,7 +97,7 @@ def process_job(job: dict, hyp3_url: str) -> None:
         message = _generate_ingest_message(job)
         if not util.exists_in_cmr(
             os.environ['CMR_DOMAIN'],
-            ingest_message.CmrCollection.ARIA_S1_GUNW.value,
+            ingest_message.ARIA_S1_GUNW_COLLECTION,
             message['identifier'],
             _granule_ur_pattern,
         ):

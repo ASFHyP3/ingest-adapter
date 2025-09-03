@@ -45,7 +45,7 @@ def _get_products(bucket: str, job_id: str) -> list[ingest_message.IngestProduct
 def _get_message(product: ingest_message.IngestProduct) -> ingest_message.IngestMessage:
     return {
         'identifier': product['name'],
-        'collection': ingest_message.CmrCollection.OPERA_RTC_S1_SLC.value,
+        'collection': ingest_message.OPERA_RTC_S1_SLC_COLLECTION,
         'version': '1.6.1',
         'submissionTime': util.get_submission_time(),
         'product': product,
@@ -67,7 +67,7 @@ def process_job(job: dict) -> None:
         for product in products
         if not util.exists_in_cmr(
             os.environ['CMR_DOMAIN'],
-            ingest_message.CmrCollection.OPERA_RTC_S1_SLC.value,
+            ingest_message.OPERA_RTC_S1_SLC_COLLECTION,
             product['name'],
             _granule_ur_pattern,
         )

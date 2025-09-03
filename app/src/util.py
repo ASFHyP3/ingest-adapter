@@ -3,12 +3,8 @@ from collections.abc import Callable
 
 import requests
 
-import ingest_message
 
-
-def exists_in_cmr(
-    cmr_domain: str, short_name: ingest_message.CmrCollection, granule_ur: str, granule_ur_pattern: Callable[[str], str]
-) -> bool:
+def exists_in_cmr(cmr_domain: str, short_name: str, granule_ur: str, granule_ur_pattern: Callable[[str], str]) -> bool:
     url = f'https://{cmr_domain}/search/granules.umm_json'
     params = {
         'short_name': short_name,
