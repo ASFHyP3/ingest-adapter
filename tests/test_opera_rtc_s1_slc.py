@@ -163,7 +163,7 @@ def test_get_message(monkeypatch):
     mock_datetime.now.return_value = now
     monkeypatch.setattr(datetime, 'datetime', mock_datetime)
 
-    assert opera_rtc_s1_slc._get_message({'name': 'test-product'}) == {
+    assert opera_rtc_s1_slc._get_message({'name': 'test-product'}) == {  # type: ignore[typeddict-item]
         'identifier': 'test-product',
         'collection': 'OPERA_L2_RTC-S1_V1',
         'version': '1.6.1',
@@ -196,8 +196,8 @@ def test_send_messages(sqs_stubber):
     opera_rtc_s1_slc._send_messages(
         queue_url='myQueue',
         messages=[
-            {'identifier': 'foo'},
-            {'identifier': 'bar'},
+            {'identifier': 'foo'},  # type: ignore[typeddict-item]
+            {'identifier': 'bar'},  # type: ignore[typeddict-item]
         ],
     )
 
