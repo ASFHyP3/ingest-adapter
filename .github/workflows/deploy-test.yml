@@ -24,6 +24,7 @@ jobs:
           EARTHDATA_PASSWORD: ${{ secrets.EARTHDATA_PASSWORD }}
           INGEST_TOPIC_ARN: ${{ secrets.INGEST_TOPIC_ARN }}
           OPERA_RTC_QUEUE_URL: ${{ secrets.OPERA_RTC_QUEUE_URL }}
+          GUNW_QUEUE_URL : ${{ secrests.GUNW_QUEUE_URL }}
           HYP3_ACCOUNT_IDS: ${{ secrets.HYP3_ACCOUNT_IDS }}
           CMR_DOMAIN: cmr.uat.earthdata.nasa.gov
           HYP3_CONTENT_BUCKET: hyp3-opera-uat-contentbucket-hnb0kgwnsc0b

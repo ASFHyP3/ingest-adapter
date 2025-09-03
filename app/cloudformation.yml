@@ -26,6 +26,9 @@ Parameters:
   OperaRtcQueueUrl:
     Type: String
 
+  GunwQueueUrl:
+    Type: String
+
   VpcId:
     Type: AWS::EC2::VPC::Id
 
@@ -112,6 +115,7 @@ Resources:
           CMR_DOMAIN: !Ref CmrDomain
           HYP3_CONTENT_BUCKET: !Ref HyP3ContentBucket
           OPERA_RTC_QUEUE_URL: !Ref OperaRtcQueueUrl
+          GUNW_QUEUE_URL: !Ref GunwQueueUrl
 
   EDLSecret:
     Type: AWS::SecretsManager::Secret
