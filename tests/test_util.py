@@ -57,7 +57,9 @@ def test_exists_in_cmr():
 def test_get_file_type():
     assert util.get_file_type('foo.tif') == 'data'
     assert util.get_file_type('bar.h5') == 'data'
+    assert util.get_file_type('foo.nc') == 'data'
     assert util.get_file_type('hello/world.iso.xml') == 'metadata'
+    assert util.get_file_type('world.json') == 'metadata'
     assert util.get_file_type('browse.png') == 'browse'
     with pytest.raises(ValueError):
         assert util.get_file_type('bad_file.zip')
