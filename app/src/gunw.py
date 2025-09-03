@@ -11,9 +11,6 @@ import ingest
 import util
 
 
-s3 = boto3.client('s3')
-
-
 @dataclass(frozen=True)
 class JobTypeIngestConfig:
     hyp3_urls: list[str]
@@ -38,7 +35,9 @@ def _granule_ur_pattern(granule_ur: str) -> str:
 
 def _generate_ingest_message(hyp3_job_dict: dict) -> ingest.IngestMessage:
     bucket = hyp3_job_dict['files'][0]['s3']['bucket']
-    response = s3.list_objects_v2(Bucket=bucket, Prefix=hyp3_job_dict['job_id'])
+    print(bucket, hyp3_job_dict['job_id'])
+    response = aws.S3_CLIENT.list_objects_v2(Bucket=bucket, Prefix=hyp3_job_dict['job_id'])
+    print(response)
 
     files: list[ingest.IngestProductFile] = [
         {
