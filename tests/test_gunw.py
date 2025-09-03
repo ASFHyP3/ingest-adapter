@@ -1,4 +1,5 @@
 from unittest.mock import MagicMock, patch
+import datetime
 
 import pytest
 
@@ -22,6 +23,11 @@ def test_generate_ingest_message(s3_bucket, gunw_data_path, monkeypatch):
     aws.S3_CLIENT.upload_file(str(gunw_data_path / 'browse.png'), s3_bucket, 'myPrefix/myFilename.png')
     aws.S3_CLIENT.upload_file(str(gunw_data_path / 'data.nc'), s3_bucket, 'myPrefix/myFilename.nc')
 
+    now = datetime.datetime(2025, 2, 18, 1, 2, 3, 456, tzinfo=datetime.UTC)
+    mock_datetime = MagicMock(wraps=datetime.datetime)
+    mock_datetime.now.return_value = now
+    monkeypatch.setattr(datetime, 'datetime', mock_datetime)
+
     job = {
         'job_id': 'myPrefix',
         'files': [
@@ -33,22 +39,46 @@ def test_generate_ingest_message(s3_bucket, gunw_data_path, monkeypatch):
             },
         ],
     }
-    expected = {
-        'ProductName': 'myFilename',
-        'Browse': {
-            'Bucket': 'myBucket',
-            'Key': 'myPrefix/myFilename.png',
-        },
-        'Metadata': {
-            'Bucket': 'myBucket',
-            'Key': 'myPrefix/myFilename.json',
-        },
-        'Product': {
-            'Bucket': 'myBucket',
-            'Key': 'myPrefix/myFilename.nc',
-        },
+    product = {
+        'name': 'myFilename',
+        'files': [
+            {
+                'name': 'myFilename.json',
+                'type': 'metadata',
+                'uri': 's3://myBucket/myPrefix/myFilename.json',
+                'size': 2675,
+                'checksum': '3b938e3797b8d5a90728ff64f7209752',
+                'checksumType': 'md5',
+            },
+            {
+                'name': 'myFilename.nc',
+                'type': 'data',
+                'uri': 's3://myBucket/myPrefix/myFilename.nc',
+                'size': 0,
+                'checksum': 'd41d8cd98f00b204e9800998ecf8427e',
+                'checksumType': 'md5',
+            },
+            {
+                'name': 'myFilename.png',
+                'type': 'browse',
+                'uri': 's3://myBucket/myPrefix/myFilename.png',
+                'size': 737869,
+                'checksum': 'e5094bda56e2316f2ec71d708cf1b4e6',
+                'checksumType': 'md5',
+            },
+        ],
+        'dataVersion': '1.0',
     }
-
+    expected = {
+        'identifier': 'myFilename',
+        'collection': 'ARIA_S1_GUNW',
+        'version': '1.6.1',
+        'submissionTime': '2025-02-18T01:02:03.000456Z',
+        'product': product,
+        'provider': 'ASF_HyP3',
+        'trace': 'ASF-TOOLS',
+    }
+    print(gunw._generate_ingest_message(job))
     assert gunw._generate_ingest_message(job) == expected
 
 
