@@ -55,7 +55,7 @@ def test_publish_message():
 
         mock_client.assert_called_once_with('sqs', region_name='us-east-1')
         mock_sqs.send_message.assert_called_once_with(
-            QueueURL='arn:aws:sns:us-east-1:123456789012:myTopic',
+            QueueUrl='arn:aws:sns:us-east-1:123456789012:myTopic',
             Message='{"ProductName": "foo"}',
         )
 
@@ -67,7 +67,7 @@ def test_publish_message():
 
         mock_client.assert_called_once_with('sqs', region_name='us-west-2')
         mock_sqs.send_message.assert_called_once_with(
-            QueueURL='arn:aws:sns:us-west-2:123456789012:myTopic',
+            QueueUrl='arn:aws:sns:us-west-2:123456789012:myTopic',
             Message='{"ProductName": "bar"}',
         )
 
