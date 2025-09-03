@@ -63,7 +63,7 @@ def _generate_ingest_message(hyp3_job_dict: dict) -> ingest.IngestMessage:
         'identifier': product_name,
         'collection': ingest.Collection.ARIA_S1_GUNW,
         'version': '1.6.1',
-        'submissionTime': datetime.datetime.now(tz=datetime.UTC).isoformat().replace('+00:00', 'Z'),
+        'submissionTime': util.get_submission_time(),
         'product': product,
         'provider': ingest.PROVIDER,
         'trace': ingest.TRACE,

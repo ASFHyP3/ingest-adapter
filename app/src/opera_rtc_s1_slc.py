@@ -48,7 +48,7 @@ def _get_message(product: ingest.IngestProduct) -> ingest.IngestMessage:
         'identifier': product['name'],
         'collection': ingest.Collection.OPERA_RTC_S1_SLC,
         'version': '1.6.1',
-        'submissionTime': datetime.datetime.now(tz=datetime.UTC).isoformat().replace('+00:00', 'Z'),
+        'submissionTime': util.get_submission_time(),
         'product': product,
         'provider': ingest.PROVIDER,
         'trace': ingest.TRACE,

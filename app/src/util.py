@@ -1,7 +1,9 @@
+import datetime
 from collections.abc import Callable
 
-import ingest
 import requests
+
+import ingest
 
 
 def exists_in_cmr(
@@ -23,7 +25,7 @@ def exists_in_cmr(
 
 
 def get_file_type(key: str) -> str:
-    if key.endswith('.tif') or key.endswith('.h5'):
+    if key.endswith('.tif') or key.endswith('.h5') or key.endswith('.nc'):
         return 'data'
     elif key.endswith('.png'):
         return 'browse'
@@ -31,3 +33,7 @@ def get_file_type(key: str) -> str:
         return 'metadata'
     else:
         raise ValueError(f'Could not determine file type for {key}')
+
+
+def get_submission_time() -> str:
+    return datetime.datetime.now(tz=datetime.UTC).isoformat().replace('+00:00', 'Z')
