@@ -67,7 +67,7 @@ def process_job(job: dict) -> None:
         for product in products
         if not util.exists_in_cmr(
             os.environ['CMR_DOMAIN'],
-            str(ingest_message.CmrCollection.OPERA_RTC_S1_SLC.value),
+            ingest_message.CmrCollection.OPERA_RTC_S1_SLC.value,
             product['name'],
             _granule_ur_pattern,
         )

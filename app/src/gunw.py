@@ -97,7 +97,7 @@ def process_job(job: dict, hyp3_url: str) -> None:
         message = _generate_ingest_message(job)
         if not util.exists_in_cmr(
             os.environ['CMR_DOMAIN'],
-            str(ingest_message.CmrCollection.ARIA_S1_GUNW.value),
+            ingest_message.CmrCollection.ARIA_S1_GUNW.value,
             message['identifier'],
             _granule_ur_pattern,
         ):
