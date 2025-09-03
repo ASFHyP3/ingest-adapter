@@ -96,6 +96,6 @@ def process_job(job: dict, hyp3_url: str) -> None:
     if _qualifies_for_ingest(job, hyp3_url):
         ingest_message = _generate_ingest_message(job)
         if not util.exists_in_cmr(
-            os.environ['CMR_DOMAIN'], ingest.Collection.ARIA_S1_GUNW, ingest_message['identifier'], _granule_ur_pattern
+            os.environ['CMR_DOMAIN'], str(ingest.Collection.ARIA_S1_GUNW), ingest_message['identifier'], _granule_ur_pattern
         ):
             _publish_message(ingest_message, os.environ['GUNW_QUEUE_URL'])

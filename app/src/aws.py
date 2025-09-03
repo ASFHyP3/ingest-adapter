@@ -3,7 +3,7 @@ import hashlib
 import boto3
 
 
-ONE_MB = 1024 * 1024
+ONE_MB = 1024 * 1024 * 1024
 S3_CLIENT = boto3.client('s3')
 
 
