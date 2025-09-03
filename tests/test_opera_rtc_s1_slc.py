@@ -222,7 +222,7 @@ def test_process_job(monkeypatch):
 
     monkeypatch.setenv('CMR_DOMAIN', 'test-cmr-domain')
     monkeypatch.setenv('HYP3_CONTENT_BUCKET', 'test-bucket')
-    monkeypatch.setenv('QUEUE_URL', 'test-queue-url')
+    monkeypatch.setenv('OPERA_RTC_QUEUE_URL', 'test-queue-url')
 
     now = datetime.datetime(2025, 2, 18, 1, 2, 3, 456, tzinfo=datetime.UTC)
     mock_datetime = MagicMock(wraps=datetime.datetime)

@@ -22,7 +22,7 @@ inputs:
     required: true
   HYP3_CONTENT_BUCKET:
     required: true
-  QUEUE_URL:
+  OPERA_RTC_QUEUE_URL:
     required: true
   VPC_ID:
     required: true
@@ -67,6 +67,6 @@ runs:
               EarthdataPassword='${{ inputs.EARTHDATA_PASSWORD }}' \
               CmrDomain='${{ inputs.CMR_DOMAIN }}' \
               HyP3ContentBucket='${{ inputs.HYP3_CONTENT_BUCKET }}' \
-              QueueUrl='${{ inputs.QUEUE_URL }}' \
+              OperaRtcQueueUrl='${{ inputs.OPERA_RTC_QUEUE_URL }}' \
               VpcId='${{ inputs.VPC_ID }}' \
               SubnetIds='${{ inputs.SUBNET_IDS }}'

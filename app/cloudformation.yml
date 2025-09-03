@@ -23,7 +23,7 @@ Parameters:
   HyP3ContentBucket:
     Type: String
 
-  QueueUrl:
+  OperaRtcQueueUrl:
     Type: String
 
   VpcId:
@@ -111,7 +111,7 @@ Resources:
           INGEST_TOPIC_ARN: !Ref IngestTopicArn
           CMR_DOMAIN: !Ref CmrDomain
           HYP3_CONTENT_BUCKET: !Ref HyP3ContentBucket
-          QUEUE_URL: !Ref QueueUrl
+          OPERA_RTC_QUEUE_URL: !Ref OperaRtcQueueUrl
 
   EDLSecret:
     Type: AWS::SecretsManager::Secret
