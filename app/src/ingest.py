@@ -1,4 +1,14 @@
+from enum import StrEnum
 from typing import TypedDict
+
+
+class Collection(StrEnum):
+    ARIA_S1_GUNW = 'ARIA_S1_GUNW'
+    OPERA_RTC_S1_SLC = 'OPERA_L2_RTC-S1_V1'
+
+
+PROVIDER = 'ASF_HyP3'
+TRACE = 'ASF-TOOLS'
 
 
 class IngestProductFile(TypedDict):
@@ -18,7 +28,7 @@ class IngestProduct(TypedDict):
 
 class IngestMessage(TypedDict):
     identifier: str
-    collection: str
+    collection: Collection
     version: str
     submissionTime: str
     product: IngestProduct

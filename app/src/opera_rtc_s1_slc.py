@@ -28,7 +28,7 @@ def _get_products(bucket: str, job_id: str) -> list[ingest.IngestProduct]:
             'files': [
                 {
                     'name': Path(obj['Key']).name,
-                    'type': _get_file_type(obj['Key']),
+                    'type': util.get_file_type(obj['Key']),
                     'uri': f's3://{bucket}/{obj["Key"]}',
                     'size': obj['Size'],
                     'checksum': obj['ETag'].strip('"'),
@@ -43,26 +43,15 @@ def _get_products(bucket: str, job_id: str) -> list[ingest.IngestProduct]:
     ]
 
 
-def _get_file_type(key: str) -> str:
-    if key.endswith('.tif') or key.endswith('.h5'):
-        return 'data'
-    elif key.endswith('.png'):
-        return 'browse'
-    elif key.endswith('.iso.xml'):
-        return 'metadata'
-    else:
-        raise ValueError(f'Could not determine file type for {key}')
-
-
 def _get_message(product: ingest.IngestProduct) -> ingest.IngestMessage:
     return {
         'identifier': product['name'],
-        'collection': 'OPERA_L2_RTC-S1_V1',
+        'collection': ingest.Collection.OPERA_RTC_S1_SLC,
         'version': '1.6.1',
         'submissionTime': datetime.datetime.now(tz=datetime.UTC).isoformat().replace('+00:00', 'Z'),
         'product': product,
-        'provider': 'ASF_HyP3',
-        'trace': 'ASF-TOOLS',
+        'provider': ingest.PROVIDER,
+        'trace': ingest.TRACE,
     }
 
 
@@ -77,6 +66,8 @@ def process_job(job: dict) -> None:
     messages = [
         _get_message(product)
         for product in products
-        if not util.exists_in_cmr(os.environ['CMR_DOMAIN'], 'OPERA_L2_RTC-S1_V1', product['name'], _granule_ur_pattern)
+        if not util.exists_in_cmr(
+            os.environ['CMR_DOMAIN'], ingest.Collection.OPERA_RTC_S1_SLC, product['name'], _granule_ur_pattern
+        )
     ]
     _send_messages(os.environ['QUEUE_URL'], messages)
