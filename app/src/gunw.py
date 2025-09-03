@@ -6,7 +6,7 @@ from dataclasses import dataclass
 import boto3
 
 import aws
-import ingest
+import ingest_message
 import util
 
 
@@ -35,11 +35,11 @@ def _granule_ur_pattern(granule_ur: str) -> str:
     return granule_ur.rsplit('-', 1)[0] + '-*'
 
 
-def _generate_ingest_message(hyp3_job_dict: dict) -> ingest.IngestMessage:
+def _generate_ingest_message(hyp3_job_dict: dict) -> ingest_message.IngestMessage:
     bucket = hyp3_job_dict['files'][0]['s3']['bucket']
     response = aws.S3_CLIENT.list_objects_v2(Bucket=bucket, Prefix=hyp3_job_dict['job_id'])
 
-    files: list[ingest.IngestProductFile] = [
+    files: list[ingest_message.IngestProductFile] = [
         {
             'name': pathlib.Path(obj['Key']).name,
             'type': util.get_file_type(obj['Key']),
@@ -52,7 +52,7 @@ def _generate_ingest_message(hyp3_job_dict: dict) -> ingest.IngestMessage:
     ]
 
     product_name = pathlib.Path(hyp3_job_dict['files'][0]['s3']['key']).stem
-    product: ingest.IngestProduct = {
+    product: ingest_message.IngestProduct = {
         'name': product_name,
         'files': files,
         'dataVersion': '1.0',
@@ -60,12 +60,12 @@ def _generate_ingest_message(hyp3_job_dict: dict) -> ingest.IngestMessage:
 
     return {
         'identifier': product_name,
-        'collection': str(ingest.Collection.ARIA_S1_GUNW),
+        'collection': str(ingest_message.Collection.ARIA_S1_GUNW),
         'version': '1.6.1',
         'submissionTime': util.get_submission_time(),
         'product': product,
-        'provider': ingest.PROVIDER,
-        'trace': ingest.TRACE,
+        'provider': ingest_message.PROVIDER,
+        'trace': ingest_message.TRACE,
     }
 
 
@@ -94,8 +94,8 @@ def _qualifies_for_ingest(job: dict, hyp3_url: str) -> bool:
 
 def process_job(job: dict, hyp3_url: str) -> None:
     if _qualifies_for_ingest(job, hyp3_url):
-        ingest_message = _generate_ingest_message(job)
+        message = _generate_ingest_message(job)
         if not util.exists_in_cmr(
-            os.environ['CMR_DOMAIN'], str(ingest.Collection.ARIA_S1_GUNW), ingest_message['identifier'], _granule_ur_pattern
+            os.environ['CMR_DOMAIN'], str(ingest_message.Collection.ARIA_S1_GUNW), message['identifier'], _granule_ur_pattern
         ):
-            _publish_message(ingest_message, os.environ['GUNW_QUEUE_URL'])
+            _publish_message(message, os.environ['GUNW_QUEUE_URL'])

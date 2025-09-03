@@ -1,11 +1,10 @@
-import datetime
 import json
 import os
 from pathlib import Path
 
 import boto3
 
-import ingest
+import ingest_message
 import util
 
 
@@ -17,7 +16,7 @@ def _granule_ur_pattern(granule_ur: str) -> str:
     return f'{granule_ur[:49]}*{granule_ur[64:]}'
 
 
-def _get_products(bucket: str, job_id: str) -> list[ingest.IngestProduct]:
+def _get_products(bucket: str, job_id: str) -> list[ingest_message.IngestProduct]:
     response = s3.list_objects_v2(Bucket=bucket, Prefix=job_id)
 
     product_names = {Path(obj['Key']).stem for obj in response['Contents'] if obj['Key'].endswith('.h5')}
@@ -43,19 +42,19 @@ def _get_products(bucket: str, job_id: str) -> list[ingest.IngestProduct]:
     ]
 
 
-def _get_message(product: ingest.IngestProduct) -> ingest.IngestMessage:
+def _get_message(product: ingest_message.IngestProduct) -> ingest_message.IngestMessage:
     return {
         'identifier': product['name'],
-        'collection': str(ingest.Collection.OPERA_RTC_S1_SLC),
+        'collection': str(ingest_message.Collection.OPERA_RTC_S1_SLC),
         'version': '1.6.1',
         'submissionTime': util.get_submission_time(),
         'product': product,
-        'provider': ingest.PROVIDER,
-        'trace': ingest.TRACE,
+        'provider': ingest_message.PROVIDER,
+        'trace': ingest_message.TRACE,
     }
 
 
-def _send_messages(queue_url: str, messages: list[ingest.IngestMessage]) -> None:
+def _send_messages(queue_url: str, messages: list[ingest_message.IngestMessage]) -> None:
     for message in messages:
         print(f'Publishing {message["identifier"]} to {queue_url}')
         sqs.send_message(QueueUrl=queue_url, MessageBody=json.dumps(message))
@@ -67,7 +66,7 @@ def process_job(job: dict) -> None:
         _get_message(product)
         for product in products
         if not util.exists_in_cmr(
-            os.environ['CMR_DOMAIN'], ingest.Collection.OPERA_RTC_S1_SLC, product['name'], _granule_ur_pattern
+            os.environ['CMR_DOMAIN'], str(ingest_message.Collection.OPERA_RTC_S1_SLC), product['name'], _granule_ur_pattern
         )
     ]
     _send_messages(os.environ['OPERA_RTC_QUEUE_URL'], messages)
