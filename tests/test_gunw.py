@@ -2,6 +2,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
+import aws
 import gunw
 from gunw import A19_URL, GUNW_USERNAME, TIBET_URL
 
@@ -16,12 +17,17 @@ def test_granule_ur_pattern():
     assert gunw._granule_ur_pattern(granule_ur) == expected
 
 
-def test_generate_ingest_message(monkeypatch):
+def test_generate_ingest_message(s3_bucket, gunw_data_path, monkeypatch):
+    aws.S3_CLIENT.upload_file(str(gunw_data_path / 'metadata.json'), s3_bucket, 'myPrefix/myFilename.json')
+    aws.S3_CLIENT.upload_file(str(gunw_data_path / 'browse.png'), s3_bucket, 'myPrefix/myFilename.png')
+    aws.S3_CLIENT.upload_file(str(gunw_data_path / 'data.nc'), s3_bucket, 'myPrefix/myFilename.nc')
+
     job = {
+        'job_id': 'myPrefix',
         'files': [
             {
                 's3': {
-                    'bucket': 'myBucket',
+                    'bucket': s3_bucket,
                     'key': 'myPrefix/myFilename.nc',
                 },
             },
