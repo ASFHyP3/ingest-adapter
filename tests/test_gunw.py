@@ -51,11 +51,13 @@ def test_publish_message():
         mock_sqs = MagicMock()
         mock_client.return_value = mock_sqs
 
-        gunw._publish_message({'ProductName': 'foo'}, 'arn:aws:sns:us-east-1:123456789012:myTopic') # TODO update to queue url
+        # TODO update to queue url
+        gunw._publish_message({'ProductName': 'foo'}, 'arn:aws:sns:us-east-1:123456789012:myTopic')
 
         mock_client.assert_called_once_with('sqs', region_name='us-east-1')
         mock_sqs.send_message.assert_called_once_with(
-            QueueUrl='arn:aws:sns:us-east-1:123456789012:myTopic', # TODO update to queue url
+            # TODO update to queue url
+            QueueUrl='arn:aws:sns:us-east-1:123456789012:myTopic',
             Message='{"ProductName": "foo"}',
         )
 
@@ -63,11 +65,13 @@ def test_publish_message():
         mock_sqs = MagicMock()
         mock_client.return_value = mock_sqs
 
-        gunw._publish_message({'ProductName': 'bar'}, 'arn:aws:sns:us-west-2:123456789012:myTopic') # TODO update to queue url
+        # TODO update to queue url
+        gunw._publish_message({'ProductName': 'bar'}, 'arn:aws:sns:us-west-2:123456789012:myTopic')
 
         mock_client.assert_called_once_with('sqs', region_name='us-west-2')
         mock_sqs.send_message.assert_called_once_with(
-            QueueUrl='arn:aws:sns:us-west-2:123456789012:myTopic', # TODO update to queue url
+            # TODO update to queue url
+            QueueUrl='arn:aws:sns:us-west-2:123456789012:myTopic',
             Message='{"ProductName": "bar"}',
         )
 

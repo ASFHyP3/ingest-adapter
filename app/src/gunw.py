@@ -8,6 +8,9 @@ import boto3
 import util
 
 
+sqs = boto3.client('sqs')
+
+
 @dataclass(frozen=True)
 class JobTypeIngestConfig:
     hyp3_urls: list[str]
