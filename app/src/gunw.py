@@ -12,6 +12,7 @@ import util
 
 
 s3 = boto3.client('s3')
+sqs = boto3.client('sqs')
 
 
 @dataclass(frozen=True)
@@ -70,14 +71,10 @@ def _generate_ingest_message(hyp3_job_dict: dict) -> ingest.IngestMessage:
     }
 
 
-def _publish_message(message: ingest.IngestMessage, topic_arn: str) -> None:
-    print(f'Publishing {message["identifier"]} to {topic_arn}')
-    topic_region = topic_arn.split(':')[3]
-    sns = boto3.client('sns', region_name=topic_region)
-    sns.publish(
-        TopicArn=topic_arn,
-        Message=json.dumps(message),
-    )
+# TODO: consider moving to util (since it's copy-pasted from opera_rtc)
+def _publish_message(message: dict, queue_url: str) -> None:
+    print(f'Publishing {message["identifier"]} to {queue_url}')
+    sqs.send_message(QueueUrl=queue_url, MessageBody=json.dumps(message))
 
 
 def _qualifies_for_ingest(job: dict, hyp3_url: str) -> bool:
@@ -103,4 +100,4 @@ def process_job(job: dict, hyp3_url: str) -> None:
         if not util.exists_in_cmr(
             os.environ['CMR_DOMAIN'], ingest.Collection.ARIA_S1_GUNW, ingest_message['identifier'], _granule_ur_pattern
         ):
-            _publish_message(ingest_message, os.environ['INGEST_TOPIC_ARN'])
+            _publish_message(ingest_message, os.environ['GUNW_QUEUE_URL'])

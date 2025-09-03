@@ -70,4 +70,4 @@ def process_job(job: dict) -> None:
             os.environ['CMR_DOMAIN'], ingest.Collection.OPERA_RTC_S1_SLC, product['name'], _granule_ur_pattern
         )
     ]
-    _send_messages(os.environ['QUEUE_URL'], messages)
+    _send_messages(os.environ['OPERA_RTC_QUEUE_URL'], messages)

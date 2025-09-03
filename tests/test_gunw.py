@@ -48,33 +48,37 @@ def test_generate_ingest_message(monkeypatch):
 
 def test_publish_message():
     with patch('boto3.client') as mock_client:
-        mock_sns = MagicMock()
-        mock_client.return_value = mock_sns
+        mock_sqs = MagicMock()
+        mock_client.return_value = mock_sqs
 
+        # TODO update to queue url
         gunw._publish_message({'ProductName': 'foo'}, 'arn:aws:sns:us-east-1:123456789012:myTopic')
 
-        mock_client.assert_called_once_with('sns', region_name='us-east-1')
-        mock_sns.publish.assert_called_once_with(
-            TopicArn='arn:aws:sns:us-east-1:123456789012:myTopic',
+        mock_client.assert_called_once_with('sqs', region_name='us-east-1')
+        mock_sqs.send_message.assert_called_once_with(
+            # TODO update to queue url
+            QueueUrl='arn:aws:sns:us-east-1:123456789012:myTopic',
             Message='{"ProductName": "foo"}',
         )
 
     with patch('boto3.client') as mock_client:
-        mock_sns = MagicMock()
-        mock_client.return_value = mock_sns
+        mock_sqs = MagicMock()
+        mock_client.return_value = mock_sqs
 
+        # TODO update to queue url
         gunw._publish_message({'ProductName': 'bar'}, 'arn:aws:sns:us-west-2:123456789012:myTopic')
 
-        mock_client.assert_called_once_with('sns', region_name='us-west-2')
-        mock_sns.publish.assert_called_once_with(
-            TopicArn='arn:aws:sns:us-west-2:123456789012:myTopic',
+        mock_client.assert_called_once_with('sqs', region_name='us-west-2')
+        mock_sqs.send_message.assert_called_once_with(
+            # TODO update to queue url
+            QueueUrl='arn:aws:sns:us-west-2:123456789012:myTopic',
             Message='{"ProductName": "bar"}',
         )
 
 
 def test_process_job_if_not_archived(monkeypatch):
     monkeypatch.setenv('CMR_DOMAIN', 'cmr.earthdata.nasa.gov')
-    monkeypatch.setenv('INGEST_TOPIC_ARN', 'myTopicArn')
+    monkeypatch.setenv('GUNW_QUEUE_URL', 'myQueueUrl')
 
     job = {
         'job_type': 'ARIA_S1_GUNW',
@@ -113,7 +117,7 @@ def test_process_job_if_not_archived(monkeypatch):
         mock_exists_in_cmr.assert_called_once_with(
             'cmr.earthdata.nasa.gov', 'ARIA_S1_GUNW', 'myFilename', gunw._granule_ur_pattern
         )
-        mock_publish_message.assert_called_once_with(expected_ingest_message, 'myTopicArn')
+        mock_publish_message.assert_called_once_with(expected_ingest_message, 'myQueueUrl')
 
     with (
         patch('util.exists_in_cmr', return_value=True) as mock_exists_in_cmr,
@@ -143,7 +147,7 @@ def test_process_job_if_not_archived(monkeypatch):
 )
 def test_process_job_if_qualifies(monkeypatch, job_type: str, user_id: str, hyp3_url: str, expected_to_qualify: bool):
     monkeypatch.setenv('CMR_DOMAIN', 'cmr.earthdata.nasa.gov')
-    monkeypatch.setenv('INGEST_TOPIC_ARN', 'myTopicArn')
+    monkeypatch.setenv('GUNW_QUEUE_URL', 'myQueueUrl')
 
     job = {
         'job_type': job_type,
@@ -183,7 +187,7 @@ def test_process_job_if_qualifies(monkeypatch, job_type: str, user_id: str, hyp3
             mock_exists_in_cmr.assert_called_once_with(
                 'cmr.earthdata.nasa.gov', 'ARIA_S1_GUNW', 'myFilename', gunw._granule_ur_pattern
             )
-            mock_publish_message.assert_called_once_with(expected_ingest_message, 'myTopicArn')
+            mock_publish_message.assert_called_once_with(expected_ingest_message, 'myQueueUrl')
         else:
             mock_exists_in_cmr.assert_not_called()
             mock_publish_message.assert_not_called()
