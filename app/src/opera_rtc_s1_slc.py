@@ -45,7 +45,7 @@ def _get_products(bucket: str, job_id: str) -> list[ingest_message.IngestProduct
 def _get_message(product: ingest_message.IngestProduct) -> ingest_message.IngestMessage:
     return {
         'identifier': product['name'],
-        'collection': str(ingest_message.CmrCollection.OPERA_RTC_S1_SLC.value),
+        'collection': ingest_message.CmrCollection.OPERA_RTC_S1_SLC.value,
         'version': '1.6.1',
         'submissionTime': util.get_submission_time(),
         'product': product,

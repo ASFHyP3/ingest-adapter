@@ -60,7 +60,7 @@ def _generate_ingest_message(hyp3_job_dict: dict) -> ingest_message.IngestMessag
 
     return {
         'identifier': product_name,
-        'collection': str(ingest_message.CmrCollection.ARIA_S1_GUNW.value),
+        'collection': ingest_message.CmrCollection.ARIA_S1_GUNW.value,
         'version': '1.6.1',
         'submissionTime': util.get_submission_time(),
         'product': product,
