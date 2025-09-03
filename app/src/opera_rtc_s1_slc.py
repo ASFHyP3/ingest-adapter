@@ -5,6 +5,7 @@ from pathlib import Path
 
 import boto3
 
+import ingest
 import util
 
 
@@ -16,7 +17,7 @@ def _granule_ur_pattern(granule_ur: str) -> str:
     return f'{granule_ur[:49]}*{granule_ur[64:]}'
 
 
-def _get_products(bucket: str, job_id: str) -> list[dict]:
+def _get_products(bucket: str, job_id: str) -> list[ingest.IngestProduct]:
     response = s3.list_objects_v2(Bucket=bucket, Prefix=job_id)
 
     product_names = {Path(obj['Key']).stem for obj in response['Contents'] if obj['Key'].endswith('.h5')}
@@ -53,7 +54,7 @@ def _get_file_type(key: str) -> str:
         raise ValueError(f'Could not determine file type for {key}')
 
 
-def _get_message(product: dict) -> dict:
+def _get_message(product: ingest.IngestProduct) -> ingest.IngestMessage:
     return {
         'identifier': product['name'],
         'collection': 'OPERA_L2_RTC-S1_V1',
@@ -65,7 +66,7 @@ def _get_message(product: dict) -> dict:
     }
 
 
-def _send_messages(queue_url: str, messages: list[dict]) -> None:
+def _send_messages(queue_url: str, messages: list[ingest.IngestMessage]) -> None:
     for message in messages:
         print(f'Publishing {message["identifier"]} to {queue_url}')
         sqs.send_message(QueueUrl=queue_url, MessageBody=json.dumps(message))
