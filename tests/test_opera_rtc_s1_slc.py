@@ -157,22 +157,13 @@ def test_get_products(s3_stubber):
     ]
 
 
-def test_get_file_type():
-    assert opera_rtc_s1_slc._get_file_type('foo.tif') == 'data'
-    assert opera_rtc_s1_slc._get_file_type('bar.h5') == 'data'
-    assert opera_rtc_s1_slc._get_file_type('hello/world.iso.xml') == 'metadata'
-    assert opera_rtc_s1_slc._get_file_type('browse.png') == 'browse'
-    with pytest.raises(ValueError):
-        assert opera_rtc_s1_slc._get_file_type('bad_file.zip')
-
-
 def test_get_message(monkeypatch):
     now = datetime.datetime(2025, 2, 18, 1, 2, 3, 456, tzinfo=datetime.UTC)
     mock_datetime = MagicMock(wraps=datetime.datetime)
     mock_datetime.now.return_value = now
     monkeypatch.setattr(datetime, 'datetime', mock_datetime)
 
-    assert opera_rtc_s1_slc._get_message({'name': 'test-product'}) == {
+    assert opera_rtc_s1_slc._get_message({'name': 'test-product'}) == {  # type: ignore[typeddict-item]
         'identifier': 'test-product',
         'collection': 'OPERA_L2_RTC-S1_V1',
         'version': '1.6.1',
@@ -205,8 +196,8 @@ def test_send_messages(sqs_stubber):
     opera_rtc_s1_slc._send_messages(
         queue_url='myQueue',
         messages=[
-            {'identifier': 'foo'},
-            {'identifier': 'bar'},
+            {'identifier': 'foo'},  # type: ignore[typeddict-item]
+            {'identifier': 'bar'},  # type: ignore[typeddict-item]
         ],
     )
 

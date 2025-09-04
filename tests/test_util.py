@@ -1,3 +1,4 @@
+import pytest
 import responses
 
 import gunw
@@ -51,3 +52,14 @@ def test_exists_in_cmr():
     )
     granule_ur = 'S1-GUNW-D-R-123-tops-20230605_20230512-032645-00038E_00036N-PP-f518-v3_0_0'
     assert not util.exists_in_cmr('cmr.uat.earthdata.nasa.gov', 'ARIA_S1_GUNW', granule_ur, gunw._granule_ur_pattern)
+
+
+def test_get_file_type():
+    assert util.get_file_type('foo.tif') == 'data'
+    assert util.get_file_type('bar.h5') == 'data'
+    assert util.get_file_type('foo.nc') == 'data'
+    assert util.get_file_type('hello/world.iso.xml') == 'metadata'
+    assert util.get_file_type('world.json') == 'metadata'
+    assert util.get_file_type('browse.png') == 'browse'
+    with pytest.raises(ValueError):
+        assert util.get_file_type('bad_file.zip')

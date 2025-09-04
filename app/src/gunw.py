@@ -5,6 +5,8 @@ from dataclasses import dataclass
 
 import boto3
 
+import aws
+import ingest_message
 import util
 
 
@@ -33,29 +35,42 @@ def _granule_ur_pattern(granule_ur: str) -> str:
     return granule_ur.rsplit('-', 1)[0] + '-*'
 
 
-def _generate_ingest_message(hyp3_job_dict: dict) -> dict:
+def _generate_ingest_message(hyp3_job_dict: dict) -> ingest_message.IngestMessage:
     bucket = hyp3_job_dict['files'][0]['s3']['bucket']
-    product_key = pathlib.Path(hyp3_job_dict['files'][0]['s3']['key'])
+    response = aws.S3_CLIENT.list_objects_v2(Bucket=bucket, Prefix=hyp3_job_dict['job_id'])
+
+    files: list[ingest_message.IngestProductFile] = [
+        {
+            'name': pathlib.Path(obj['Key']).name,
+            'type': util.get_file_type(obj['Key']),
+            'uri': f's3://{bucket}/{obj["Key"]}',
+            'size': obj['Size'],
+            'checksum': aws.md5_for_s3_file(bucket, obj['Key']),
+            'checksumType': 'md5',
+        }
+        for obj in response['Contents']
+    ]
+
+    product_name = pathlib.Path(hyp3_job_dict['files'][0]['s3']['key']).stem
+    product: ingest_message.IngestProduct = {
+        'name': product_name,
+        'files': files,
+        'dataVersion': '1.0',
+    }
 
     return {
-        'ProductName': product_key.stem,
-        'Browse': {
-            'Bucket': bucket,
-            'Key': str(product_key.with_suffix('.png')),
-        },
-        'Metadata': {
-            'Bucket': bucket,
-            'Key': str(product_key.with_suffix('.json')),
-        },
-        'Product': {
-            'Bucket': bucket,
-            'Key': str(product_key),
-        },
+        'identifier': product_name,
+        'collection': ingest_message.ARIA_S1_GUNW_COLLECTION,
+        'version': ingest_message.CNM_SCHEMA_VERSION,
+        'submissionTime': util.get_submission_time(),
+        'product': product,
+        'provider': ingest_message.PROVIDER,
+        'trace': ingest_message.TRACE,
     }
 
 
 # TODO: consider moving to util (since it's copy-pasted from opera_rtc)
-def _publish_message(message: dict, queue_url: str) -> None:
+def _publish_message(message: ingest_message.IngestMessage, queue_url: str) -> None:
     print(f'Publishing {message["identifier"]} to {queue_url}')
     sqs.send_message(QueueUrl=queue_url, MessageBody=json.dumps(message))
 
@@ -79,8 +94,11 @@ def _qualifies_for_ingest(job: dict, hyp3_url: str) -> bool:
 
 def process_job(job: dict, hyp3_url: str) -> None:
     if _qualifies_for_ingest(job, hyp3_url):
-        ingest_message = _generate_ingest_message(job)
+        message = _generate_ingest_message(job)
         if not util.exists_in_cmr(
-            os.environ['CMR_DOMAIN'], 'ARIA_S1_GUNW', ingest_message['ProductName'], _granule_ur_pattern
+            os.environ['CMR_DOMAIN'],
+            ingest_message.ARIA_S1_GUNW_COLLECTION,
+            message['identifier'],
+            _granule_ur_pattern,
         ):
-            _publish_message(ingest_message, os.environ['GUNW_QUEUE_URL'])
+            _publish_message(message, os.environ['GUNW_QUEUE_URL'])
