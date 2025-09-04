@@ -1,3 +1,4 @@
+import datetime
 from collections.abc import Callable
 
 import requests
@@ -17,3 +18,7 @@ def exists_in_cmr(cmr_domain: str, short_name: str, granule_ur: str, granule_ur_
         print(f'{granule_ur} already exists in CMR as {response.json()["items"][0]["umm"]["GranuleUR"]}')
         return True
     return False
+
+
+def get_submission_time() -> str:
+    return datetime.datetime.now(tz=datetime.UTC).isoformat().replace('+00:00', 'Z')
