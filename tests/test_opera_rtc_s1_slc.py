@@ -257,3 +257,12 @@ def test_process_job(monkeypatch):
         ]
         mock_get_products.assert_called_once_with('test-bucket', 'test-job')
         mock_send_messages.assert_called_once_with('test-queue-url', expected_messages)
+
+
+def test_opera_get_file_type():
+    assert opera_rtc_s1_slc._get_file_type('foo.tif') == 'data'
+    assert opera_rtc_s1_slc._get_file_type('bar.h5') == 'data'
+    assert opera_rtc_s1_slc._get_file_type('hello/world.iso.xml') == 'metadata'
+    assert opera_rtc_s1_slc._get_file_type('browse.png') == 'browse'
+    with pytest.raises(ValueError):
+        assert opera_rtc_s1_slc._get_file_type('bad_file.zip')

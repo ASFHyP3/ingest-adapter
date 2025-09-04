@@ -16,7 +16,7 @@ def _granule_ur_pattern(granule_ur: str) -> str:
     return f'{granule_ur[:49]}*{granule_ur[64:]}'
 
 
-def get_file_type(key: str) -> str:
+def _get_file_type(key: str) -> str:
     if key.endswith('.tif') or key.endswith('.h5'):
         return 'data'
     elif key.endswith('.png'):
@@ -38,7 +38,7 @@ def _get_products(bucket: str, job_id: str) -> list[ingest_message.IngestProduct
             'files': [
                 {
                     'name': Path(obj['Key']).name,
-                    'type': util.get_file_type(obj['Key']),
+                    'type': _get_file_type(obj['Key']),
                     'uri': f's3://{bucket}/{obj["Key"]}',
                     'size': obj['Size'],
                     'checksum': obj['ETag'].strip('"'),

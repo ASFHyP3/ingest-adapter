@@ -296,3 +296,11 @@ def test_process_job_if_qualifies(
         else:
             mock_exists_in_cmr.assert_not_called()
             mock_publish_message.assert_not_called()
+
+
+def test_opera_get_file_type():
+    assert gunw._get_file_type('foo.nc') == 'data'
+    assert gunw._get_file_type('world.json') == 'metadata'
+    assert gunw._get_file_type('browse.png') == 'browse'
+    with pytest.raises(ValueError):
+        assert gunw._get_file_type('bad_file.zip')
