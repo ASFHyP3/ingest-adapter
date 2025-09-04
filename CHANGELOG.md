@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.0]
+
+### Changed
+- `ARIA_S1_GUNW`, `INSAR_ISCE`, and `ARIA_RAIDER` now publish message to I&A queue in CNM format
+
 ## [0.4.1]
 
 ### Changed
