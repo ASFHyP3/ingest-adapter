@@ -78,7 +78,6 @@ def test_generate_ingest_message(s3_bucket, gunw_data_path, monkeypatch):
         'provider': 'ASF_HyP3',
         'trace': 'ASF-TOOLS',
     }
-    print(gunw._generate_ingest_message(job))
     assert gunw._generate_ingest_message(job) == expected
 
 
