@@ -10,8 +10,6 @@ inputs:
     required: true
   APP_STACK_NAME:
     required: true
-  INGEST_TOPIC_ARN:
-    required: true
   HYP3_ACCOUNT_IDS:
     required: true
   EARTHDATA_USERNAME:
@@ -63,7 +61,6 @@ runs:
           --template-file app_packaged.yml \
           --capabilities CAPABILITY_IAM \
           --parameter-overrides \
-              IngestTopicArn='${{ inputs.INGEST_TOPIC_ARN }}' \
               Hyp3AccountIds='${{ inputs.HYP3_ACCOUNT_IDS }}' \
               EarthdataUsername='${{ inputs.EARTHDATA_USERNAME }}' \
               EarthdataPassword='${{ inputs.EARTHDATA_PASSWORD }}' \

@@ -22,7 +22,6 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           EARTHDATA_USERNAME: ${{ secrets.EARTHDATA_USERNAME }}
           EARTHDATA_PASSWORD: ${{ secrets.EARTHDATA_PASSWORD }}
-          INGEST_TOPIC_ARN: ${{ secrets.INGEST_TOPIC_ARN }}
           OPERA_RTC_QUEUE_URL: ${{ secrets.OPERA_RTC_QUEUE_URL }}
           GUNW_QUEUE_URL : ${{ secrests.GUNW_QUEUE_URL }}
           HYP3_ACCOUNT_IDS: ${{ secrets.HYP3_ACCOUNT_IDS }}

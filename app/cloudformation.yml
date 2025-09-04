@@ -1,9 +1,6 @@
 AWSTemplateFormatVersion: 2010-09-09
 
 Parameters:
-  IngestTopicArn:
-    Type: String
-
   Hyp3AccountIds:
     Type: CommaDelimitedList
 
@@ -111,7 +108,6 @@ Resources:
       Environment:
         Variables:
           SECRET_ARN: !Ref EDLSecret
-          INGEST_TOPIC_ARN: !Ref IngestTopicArn
           CMR_DOMAIN: !Ref CmrDomain
           HYP3_CONTENT_BUCKET: !Ref HyP3ContentBucket
           OPERA_RTC_QUEUE_URL: !Ref OperaRtcQueueUrl
