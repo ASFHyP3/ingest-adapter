@@ -268,7 +268,7 @@ def test_process_job_if_qualifies(
             mock_publish_message.assert_not_called()
 
 
-def test_opera_get_file_type():
+def test_gunw_get_file_type():
     assert gunw._get_file_type('foo.nc') == 'data'
     assert gunw._get_file_type('world.json') == 'metadata'
     assert gunw._get_file_type('browse.png') == 'browse'
