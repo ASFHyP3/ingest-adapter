@@ -143,9 +143,6 @@ Resources:
                 Action: secretsmanager:GetSecretValue
                 Resource: !Ref EDLSecret
               - Effect: Allow
-                Action: sns:Publish
-                Resource: !Ref IngestTopicArn
-              - Effect: Allow
                 Action: sqs:SendMessage
                 Resource: arn:aws:sqs:*
               - Effect: Allow
