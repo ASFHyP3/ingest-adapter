@@ -69,7 +69,6 @@ def _generate_ingest_message(hyp3_job_dict: dict) -> ingest_message.IngestMessag
     }
 
 
-# TODO: consider moving to util (since it's copy-pasted from opera_rtc)
 def _publish_message(message: ingest_message.IngestMessage, queue_url: str) -> None:
     print(f'Publishing {message["identifier"]} to {queue_url}')
     sqs.send_message(QueueUrl=queue_url, MessageBody=json.dumps(message))
