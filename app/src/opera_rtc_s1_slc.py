@@ -61,7 +61,6 @@ def _get_message(product: ingest_message.IngestProduct) -> ingest_message.Ingest
 
 def _send_messages(queue_url: str, messages: list[ingest_message.IngestMessage]) -> None:
     for message in messages:
-        print(f'Publishing {message["identifier"]} to {queue_url}')
         aws.send_ingest_message(queue_url, message)
 
 

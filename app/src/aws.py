@@ -27,4 +27,5 @@ def list_objects_for_job(bucket: str, job_id: str) -> dict:
 
 
 def send_ingest_message(queue_url: str, message: ingest_message.IngestMessage) -> None:
+    print(f'Publishing {message["identifier"]} to {queue_url}')
     SQS_CLIENT.send_message(QueueUrl=queue_url, MessageBody=json.dumps(message))

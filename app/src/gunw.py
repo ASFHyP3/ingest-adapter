@@ -74,11 +74,6 @@ def _generate_ingest_message(hyp3_job_dict: dict) -> ingest_message.IngestMessag
     }
 
 
-def _publish_message(message: ingest_message.IngestMessage, queue_url: str) -> None:
-    print(f'Publishing {message["identifier"]} to {queue_url}')
-    aws.send_ingest_message(queue_url, message)
-
-
 def _qualifies_for_ingest(job: dict, hyp3_url: str) -> bool:
     ingest_config = INGEST_CONFIGS[job['job_type']]
 
@@ -105,4 +100,4 @@ def process_job(job: dict, hyp3_url: str) -> None:
             message['identifier'],
             _granule_ur_pattern,
         ):
-            _publish_message(message, os.environ['GUNW_QUEUE_URL'])
+            aws.send_ingest_message(os.environ['GUNW_QUEUE_URL'], message)
