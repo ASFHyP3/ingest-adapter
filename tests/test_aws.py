@@ -4,7 +4,7 @@ from botocore.stub import Stubber
 import aws
 
 
-@pytest.fixture(autouse=True)
+@pytest.fixture()
 def sqs_stubber():
     with Stubber(aws.SQS_CLIENT) as stubber:
         yield stubber

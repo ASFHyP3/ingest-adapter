@@ -8,14 +8,14 @@ import aws
 import opera_rtc_s1_slc
 
 
-@pytest.fixture(autouse=True)
+@pytest.fixture()
 def s3_stubber():
     with Stubber(aws.S3_CLIENT) as stubber:
         yield stubber
         stubber.assert_no_pending_responses()
 
 
-@pytest.fixture(autouse=True)
+@pytest.fixture()
 def sqs_stubber():
     with Stubber(aws.SQS_CLIENT) as stubber:
         yield stubber
