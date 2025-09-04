@@ -1,4 +1,3 @@
-import json
 import os
 import pathlib
 from dataclasses import dataclass
