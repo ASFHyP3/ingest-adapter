@@ -35,6 +35,17 @@ def _granule_ur_pattern(granule_ur: str) -> str:
     return granule_ur.rsplit('-', 1)[0] + '-*'
 
 
+def _get_file_type(key: str) -> str:
+    if key.endswith('.nc'):
+        return 'data'
+    elif key.endswith('.png'):
+        return 'browse'
+    elif key.endswith('.json'):
+        return 'metadata'
+    else:
+        raise ValueError(f'Could not determine file type for {key}')
+
+
 def _generate_ingest_message(hyp3_job_dict: dict) -> ingest_message.IngestMessage:
     bucket = hyp3_job_dict['files'][0]['s3']['bucket']
     response = aws.S3_CLIENT.list_objects_v2(Bucket=bucket, Prefix=hyp3_job_dict['job_id'])
@@ -42,7 +53,7 @@ def _generate_ingest_message(hyp3_job_dict: dict) -> ingest_message.IngestMessag
     files: list[ingest_message.IngestProductFile] = [
         {
             'name': pathlib.Path(obj['Key']).name,
-            'type': util.get_file_type(obj['Key']),
+            'type': _get_file_type(obj['Key']),
             'uri': f's3://{bucket}/{obj["Key"]}',
             'size': obj['Size'],
             'checksum': aws.md5_for_s3_file(bucket, obj['Key']),

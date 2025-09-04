@@ -16,6 +16,17 @@ def _granule_ur_pattern(granule_ur: str) -> str:
     return f'{granule_ur[:49]}*{granule_ur[64:]}'
 
 
+def get_file_type(key: str) -> str:
+    if key.endswith('.tif') or key.endswith('.h5'):
+        return 'data'
+    elif key.endswith('.png'):
+        return 'browse'
+    elif key.endswith('.iso.xml'):
+        return 'metadata'
+    else:
+        raise ValueError(f'Could not determine file type for {key}')
+
+
 def _get_products(bucket: str, job_id: str) -> list[ingest_message.IngestProduct]:
     response = s3.list_objects_v2(Bucket=bucket, Prefix=job_id)
 
