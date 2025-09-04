@@ -31,12 +31,12 @@ def test_publish_message(sqs_stubber):
 
     aws.send_ingest_message(
         queue_url='myQueue',
-        message={'identifier': 'foo'}  # type: ignore[typeddict-item]
+        message={'identifier': 'foo'},  # type: ignore[typeddict-item]
     )
 
     aws.send_ingest_message(
         queue_url='myQueue',
-        message={'identifier': 'bar'}  # type: ignore[typeddict-item]
+        message={'identifier': 'bar'},  # type: ignore[typeddict-item]
     )
 
 
