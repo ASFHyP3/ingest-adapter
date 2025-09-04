@@ -5,8 +5,6 @@ import pytest
 from moto import mock_aws
 from moto.core import patch_client
 
-import aws
-
 
 def pytest_configure(config):
     """Mocked AWS Credentials for moto."""
@@ -25,6 +23,8 @@ def gunw_data_path():
 
 @pytest.fixture
 def s3_bucket():
+    import aws
+
     with mock_aws():
         patch_client(aws.S3_CLIENT)
 
