@@ -2,14 +2,9 @@ import json
 import os
 from pathlib import Path
 
-import boto3
-
+import aws
 import ingest_message
 import util
-
-
-s3 = boto3.client('s3')
-sqs = boto3.client('sqs')
 
 
 def _granule_ur_pattern(granule_ur: str) -> str:
@@ -28,7 +23,7 @@ def _get_file_type(key: str) -> str:
 
 
 def _get_products(bucket: str, job_id: str) -> list[ingest_message.IngestProduct]:
-    response = s3.list_objects_v2(Bucket=bucket, Prefix=job_id)
+    response = aws.list_objects_for_job(bucket, job_id)
 
     product_names = {Path(obj['Key']).stem for obj in response['Contents'] if obj['Key'].endswith('.h5')}
 
@@ -68,7 +63,7 @@ def _get_message(product: ingest_message.IngestProduct) -> ingest_message.Ingest
 def _send_messages(queue_url: str, messages: list[ingest_message.IngestMessage]) -> None:
     for message in messages:
         print(f'Publishing {message["identifier"]} to {queue_url}')
-        sqs.send_message(QueueUrl=queue_url, MessageBody=json.dumps(message))
+        aws.send_ingest_message(queue_url, message)
 
 
 def process_job(job: dict) -> None:

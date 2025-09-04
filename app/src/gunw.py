@@ -3,14 +3,9 @@ import os
 import pathlib
 from dataclasses import dataclass
 
-import boto3
-
 import aws
 import ingest_message
 import util
-
-
-sqs = boto3.client('sqs')
 
 
 @dataclass(frozen=True)
@@ -48,7 +43,7 @@ def _get_file_type(key: str) -> str:
 
 def _generate_ingest_message(hyp3_job_dict: dict) -> ingest_message.IngestMessage:
     bucket = hyp3_job_dict['files'][0]['s3']['bucket']
-    response = aws.S3_CLIENT.list_objects_v2(Bucket=bucket, Prefix=hyp3_job_dict['job_id'])
+    response = aws.list_objects_for_job(bucket, hyp3_job_dict['job_id'])
 
     files: list[ingest_message.IngestProductFile] = [
         {
@@ -82,7 +77,7 @@ def _generate_ingest_message(hyp3_job_dict: dict) -> ingest_message.IngestMessag
 
 def _publish_message(message: ingest_message.IngestMessage, queue_url: str) -> None:
     print(f'Publishing {message["identifier"]} to {queue_url}')
-    sqs.send_message(QueueUrl=queue_url, MessageBody=json.dumps(message))
+    aws.send_ingest_message(queue_url, message)
 
 
 def _qualifies_for_ingest(job: dict, hyp3_url: str) -> bool:

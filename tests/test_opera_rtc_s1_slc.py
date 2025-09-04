@@ -4,19 +4,20 @@ from unittest.mock import MagicMock, call, patch
 import pytest
 from botocore.stub import Stubber
 
+import aws
 import opera_rtc_s1_slc
 
 
 @pytest.fixture(autouse=True)
 def s3_stubber():
-    with Stubber(opera_rtc_s1_slc.s3) as stubber:
+    with Stubber(aws.S3_CLIENT) as stubber:
         yield stubber
         stubber.assert_no_pending_responses()
 
 
 @pytest.fixture(autouse=True)
 def sqs_stubber():
-    with Stubber(opera_rtc_s1_slc.sqs) as stubber:
+    with Stubber(aws.SQS_CLIENT) as stubber:
         yield stubber
         stubber.assert_no_pending_responses()
 
