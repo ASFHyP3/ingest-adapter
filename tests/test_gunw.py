@@ -67,7 +67,7 @@ def test_generate_ingest_message(s3_bucket, gunw_data_path, monkeypatch):
                 'checksumType': 'md5',
             },
         ],
-        'dataVersion': '1.0',
+        'dataVersion': '1',
     }
     expected = {
         'identifier': 'myFilename',
@@ -134,7 +134,7 @@ def test_process_job_if_not_archived(monkeypatch, s3_bucket, gunw_data_path):
                 'checksumType': 'md5',
             },
         ],
-        'dataVersion': '1.0',
+        'dataVersion': '1',
     }
     expected_ingest_message = {
         'identifier': 'myFilename',
@@ -239,7 +239,7 @@ def test_process_job_if_qualifies(
                 'checksumType': 'md5',
             },
         ],
-        'dataVersion': '1.0',
+        'dataVersion': '1',
     }
     expected_ingest_message = {
         'identifier': 'myFilename',
