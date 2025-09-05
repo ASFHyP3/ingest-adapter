@@ -60,7 +60,7 @@ def _generate_ingest_message(hyp3_job_dict: dict) -> ingest_message.IngestMessag
     product: ingest_message.IngestProduct = {
         'name': product_name,
         'files': files,
-        'dataVersion': '1.0',
+        'dataVersion': '1',
     }
 
     return {
