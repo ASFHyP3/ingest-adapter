@@ -6,12 +6,12 @@ import boto3
 import ingest_message
 
 
-ONE_MB = 1024 * 1024 * 1024
+ONE_KB = 1024 * 1024
 S3_CLIENT = boto3.client('s3')
 SQS_CLIENT = boto3.client('sqs')
 
 
-def md5_for_s3_file(bucket: str, key: str, chunk_size: int = 5 * ONE_MB) -> str:
+def md5_for_s3_file(bucket: str, key: str, chunk_size: int = ONE_KB) -> str:
     response = S3_CLIENT.get_object(Bucket=bucket, Key=key)
 
     md5_hash = hashlib.md5()
