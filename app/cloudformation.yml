@@ -97,7 +97,7 @@ Resources:
     Properties:
       Code: src
       Handler: app.lambda_handler
-      MemorySize: 128
+      MemorySize: 512
       Role: !GetAtt LambdaRole.Arn
       Runtime: python3.13
       Timeout: 300
@@ -147,7 +147,10 @@ Resources:
                 Resource: arn:aws:sqs:*
               - Effect: Allow
                 Action: s3:ListBucket
-                Resource: !Sub "arn:aws:s3:::${HyP3ContentBucket}"
+                Resource: arn:aws:s3:::*
+              - Effect: Allow
+                Action: s3:GetObject
+                Resource: arn:aws:s3:::*/*
               - Effect: Allow
                 Action:
                   - logs:CreateLogStream
