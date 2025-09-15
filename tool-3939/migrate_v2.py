@@ -51,11 +51,16 @@ def generate_ingest_message(product_name: str, product_files: dict) -> ingest_me
     }
 
 
+# TODO: double-check a sample message before running script for all products
 def main() -> None:
     with open('products.json') as f:
         products = json.load(f)
 
     for product_name, product_files in products.items():
         message = generate_ingest_message(product_name, product_files)
-        print(message)
+        print(json.dumps(message, indent=2))
         # TODO: send message
+
+
+if __name__ == '__main__':
+    main()
