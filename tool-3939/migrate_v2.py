@@ -51,14 +51,18 @@ def generate_ingest_message(product_name: str, product_files: dict) -> ingest_me
     }
 
 
-# TODO: double-check a sample message before running script for all products
 def main() -> None:
-    with open('products.json') as f:
+    with open('aria_s1_gunw_files.json') as f:
         products = json.load(f)
 
-    for product_name, product_files in products.items():
-        message = generate_ingest_message(product_name, product_files)
-        print(json.dumps(message, indent=2))
+    product_name = 'S1-GUNW-A-R-004-tops-20171118_20161111-230701-00079W_00039N-PP-f7d8-v3_0_0'
+    product_files = products[product_name]
+    message = generate_ingest_message(product_name, product_files)
+    print(json.dumps(message, indent=2))
+
+    # for product_name, product_files in products.items():
+    #     message = generate_ingest_message(product_name, product_files)
+    #     print(json.dumps(message, indent=2))
         # TODO: send message
 
 
