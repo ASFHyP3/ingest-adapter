@@ -1,5 +1,8 @@
 import json
+import os
+from pathlib import Path
 
+import aws
 import ingest_message
 import util
 
@@ -52,18 +55,15 @@ def generate_ingest_message(product_name: str, product_files: dict) -> ingest_me
 
 
 def main() -> None:
-    with open('aria_s1_gunw_files.json') as f:
+    queue_url = os.environ['GUNW_QUEUE_URL']
+
+    with Path('aria_s1_gunw_files.json').open() as f:
         products = json.load(f)
 
-    product_name = 'S1-GUNW-A-R-004-tops-20171118_20161111-230701-00079W_00039N-PP-f7d8-v3_0_0'
-    product_files = products[product_name]
-    message = generate_ingest_message(product_name, product_files)
-    print(json.dumps(message, indent=2))
-
-    # for product_name, product_files in products.items():
-    #     message = generate_ingest_message(product_name, product_files)
-    #     print(json.dumps(message, indent=2))
-        # TODO: send message
+    for product_name, product_files in list(products.items())[:3]:  # TODO remove subscript
+        message = generate_ingest_message(product_name, product_files)
+        print(json.dumps(message, indent=2))
+        aws.send_ingest_message(queue_url, message)
 
 
 if __name__ == '__main__':
