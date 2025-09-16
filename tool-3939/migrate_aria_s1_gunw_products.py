@@ -1,35 +1,39 @@
 import json
-import pathlib
 
-import aws
-import gunw
 import ingest_message
 import util
 
 
-def get_product_file(bucket: str, key: str) -> ingest_message.IngestProductFile:
-    checksum, size = aws.md5_and_size_for_s3_file(bucket, key)
+def get_file_type_and_bucket(key: str) -> tuple[str, str]:
+    if key.endswith('.nc'):
+        return 'data', 'grfn-content-prod'
+    elif key.endswith('.png'):
+        return 'browse', 'grfn-public-prod'
+    elif key.endswith('.json'):
+        return 'metadata', 'ingest-prod-aux'
+    else:
+        raise ValueError(f'Could not determine file type for {key}')
+
+
+def get_product_file(filename: str, file_info: dict) -> ingest_message.IngestProductFile:
+    checksum, size = file_info['checksum'], file_info['size']
+    file_type, bucket = get_file_type_and_bucket(filename)
     return {
-        'name': key,
-        'type': gunw._get_file_type(key),
-        'uri': f's3://{bucket}/{key}',
+        'name': filename,
+        'type': file_type,
+        'uri': f's3://{bucket}/{filename}',
         'size': size,
         'checksum': checksum,
         'checksumType': 'md5',
     }
 
 
-def generate_ingest_message(product_key: pathlib.Path) -> ingest_message.IngestMessage:
+def generate_ingest_message(product_name: str, product_files: dict) -> ingest_message.IngestMessage:
     files: list[ingest_message.IngestProductFile] = [
-        get_product_file(bucket, key)
-        for bucket, key in [
-            ('ingest-prod-aux', str(product_key.with_suffix('.json'))),
-            ('grfn-content-prod', str(product_key)),
-            ('grfn-public-prod', str(product_key.with_suffix('.png'))),
-        ]
+        get_product_file(filename, product_files[filename])
+        for filename in [product_name + '.json', product_name + '.nc', product_name + '.png']
     ]
 
-    product_name = product_key.stem
     product: ingest_message.IngestProduct = {
         'name': product_name,
         'files': files,
@@ -47,7 +51,20 @@ def generate_ingest_message(product_key: pathlib.Path) -> ingest_message.IngestM
     }
 
 
-message = generate_ingest_message(
-    pathlib.Path('S1-GUNW-A-R-004-tops-20171118_20161111-230701-00079W_00039N-PP-f7d8-v3_0_0.nc')
-)
-print(json.dumps(message))
+def main() -> None:
+    with open('aria_s1_gunw_files.json') as f:
+        products = json.load(f)
+
+    product_name = 'S1-GUNW-A-R-004-tops-20171118_20161111-230701-00079W_00039N-PP-f7d8-v3_0_0'
+    product_files = products[product_name]
+    message = generate_ingest_message(product_name, product_files)
+    print(json.dumps(message, indent=2))
+
+    # for product_name, product_files in products.items():
+    #     message = generate_ingest_message(product_name, product_files)
+    #     print(json.dumps(message, indent=2))
+        # TODO: send message
+
+
+if __name__ == '__main__':
+    main()
