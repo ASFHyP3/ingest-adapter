@@ -4,19 +4,20 @@ from unittest.mock import MagicMock, call, patch
 import pytest
 from botocore.stub import Stubber
 
+import aws
 import opera_rtc_s1_slc
 
 
-@pytest.fixture(autouse=True)
+@pytest.fixture()
 def s3_stubber():
-    with Stubber(opera_rtc_s1_slc.s3) as stubber:
+    with Stubber(aws.S3_CLIENT) as stubber:
         yield stubber
         stubber.assert_no_pending_responses()
 
 
-@pytest.fixture(autouse=True)
+@pytest.fixture()
 def sqs_stubber():
-    with Stubber(opera_rtc_s1_slc.sqs) as stubber:
+    with Stubber(aws.SQS_CLIENT) as stubber:
         yield stubber
         stubber.assert_no_pending_responses()
 
@@ -157,22 +158,13 @@ def test_get_products(s3_stubber):
     ]
 
 
-def test_get_file_type():
-    assert opera_rtc_s1_slc._get_file_type('foo.tif') == 'data'
-    assert opera_rtc_s1_slc._get_file_type('bar.h5') == 'data'
-    assert opera_rtc_s1_slc._get_file_type('hello/world.iso.xml') == 'metadata'
-    assert opera_rtc_s1_slc._get_file_type('browse.png') == 'browse'
-    with pytest.raises(ValueError):
-        assert opera_rtc_s1_slc._get_file_type('bad_file.zip')
-
-
 def test_get_message(monkeypatch):
     now = datetime.datetime(2025, 2, 18, 1, 2, 3, 456, tzinfo=datetime.UTC)
     mock_datetime = MagicMock(wraps=datetime.datetime)
     mock_datetime.now.return_value = now
     monkeypatch.setattr(datetime, 'datetime', mock_datetime)
 
-    assert opera_rtc_s1_slc._get_message({'name': 'test-product'}) == {
+    assert opera_rtc_s1_slc._get_message({'name': 'test-product'}) == {  # type: ignore[typeddict-item]
         'identifier': 'test-product',
         'collection': 'OPERA_L2_RTC-S1_V1',
         'version': '1.6.1',
@@ -205,8 +197,8 @@ def test_send_messages(sqs_stubber):
     opera_rtc_s1_slc._send_messages(
         queue_url='myQueue',
         messages=[
-            {'identifier': 'foo'},
-            {'identifier': 'bar'},
+            {'identifier': 'foo'},  # type: ignore[typeddict-item]
+            {'identifier': 'bar'},  # type: ignore[typeddict-item]
         ],
     )
 
@@ -222,7 +214,7 @@ def test_process_job(monkeypatch):
 
     monkeypatch.setenv('CMR_DOMAIN', 'test-cmr-domain')
     monkeypatch.setenv('HYP3_CONTENT_BUCKET', 'test-bucket')
-    monkeypatch.setenv('QUEUE_URL', 'test-queue-url')
+    monkeypatch.setenv('OPERA_RTC_QUEUE_URL', 'test-queue-url')
 
     now = datetime.datetime(2025, 2, 18, 1, 2, 3, 456, tzinfo=datetime.UTC)
     mock_datetime = MagicMock(wraps=datetime.datetime)
@@ -266,3 +258,12 @@ def test_process_job(monkeypatch):
         ]
         mock_get_products.assert_called_once_with('test-bucket', 'test-job')
         mock_send_messages.assert_called_once_with('test-queue-url', expected_messages)
+
+
+def test_opera_get_file_type():
+    assert opera_rtc_s1_slc._get_file_type('foo.tif') == 'data'
+    assert opera_rtc_s1_slc._get_file_type('bar.h5') == 'data'
+    assert opera_rtc_s1_slc._get_file_type('hello/world.iso.xml') == 'metadata'
+    assert opera_rtc_s1_slc._get_file_type('browse.png') == 'browse'
+    with pytest.raises(ValueError):
+        assert opera_rtc_s1_slc._get_file_type('bad_file.zip')

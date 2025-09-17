@@ -10,8 +10,6 @@ inputs:
     required: true
   APP_STACK_NAME:
     required: true
-  INGEST_TOPIC_ARN:
-    required: true
   HYP3_ACCOUNT_IDS:
     required: true
   EARTHDATA_USERNAME:
@@ -22,7 +20,9 @@ inputs:
     required: true
   HYP3_CONTENT_BUCKET:
     required: true
-  QUEUE_URL:
+  OPERA_RTC_QUEUE_URL:
+    required: true
+  GUNW_QUEUE_URL:
     required: true
   VPC_ID:
     required: true
@@ -61,12 +61,12 @@ runs:
           --template-file app_packaged.yml \
           --capabilities CAPABILITY_IAM \
           --parameter-overrides \
-              IngestTopicArn='${{ inputs.INGEST_TOPIC_ARN }}' \
               Hyp3AccountIds='${{ inputs.HYP3_ACCOUNT_IDS }}' \
               EarthdataUsername='${{ inputs.EARTHDATA_USERNAME }}' \
               EarthdataPassword='${{ inputs.EARTHDATA_PASSWORD }}' \
               CmrDomain='${{ inputs.CMR_DOMAIN }}' \
               HyP3ContentBucket='${{ inputs.HYP3_CONTENT_BUCKET }}' \
-              QueueUrl='${{ inputs.QUEUE_URL }}' \
+              OperaRtcQueueUrl='${{ inputs.OPERA_RTC_QUEUE_URL }}' \
+              GunwQueueUrl='${{ inputs.GUNW_QUEUE_URL }}' \
               VpcId='${{ inputs.VPC_ID }}' \
               SubnetIds='${{ inputs.SUBNET_IDS }}'

@@ -1,9 +1,6 @@
 AWSTemplateFormatVersion: 2010-09-09
 
 Parameters:
-  IngestTopicArn:
-    Type: String
-
   Hyp3AccountIds:
     Type: CommaDelimitedList
 
@@ -23,7 +20,10 @@ Parameters:
   HyP3ContentBucket:
     Type: String
 
-  QueueUrl:
+  OperaRtcQueueUrl:
+    Type: String
+
+  GunwQueueUrl:
     Type: String
 
   VpcId:
@@ -108,10 +108,10 @@ Resources:
       Environment:
         Variables:
           SECRET_ARN: !Ref EDLSecret
-          INGEST_TOPIC_ARN: !Ref IngestTopicArn
           CMR_DOMAIN: !Ref CmrDomain
           HYP3_CONTENT_BUCKET: !Ref HyP3ContentBucket
-          QUEUE_URL: !Ref QueueUrl
+          OPERA_RTC_QUEUE_URL: !Ref OperaRtcQueueUrl
+          GUNW_QUEUE_URL: !Ref GunwQueueUrl
 
   EDLSecret:
     Type: AWS::SecretsManager::Secret
@@ -143,14 +143,14 @@ Resources:
                 Action: secretsmanager:GetSecretValue
                 Resource: !Ref EDLSecret
               - Effect: Allow
-                Action: sns:Publish
-                Resource: !Ref IngestTopicArn
-              - Effect: Allow
                 Action: sqs:SendMessage
                 Resource: arn:aws:sqs:*
               - Effect: Allow
                 Action: s3:ListBucket
-                Resource: !Sub "arn:aws:s3:::${HyP3ContentBucket}"
+                Resource: arn:aws:s3:::*
+              - Effect: Allow
+                Action: s3:GetObject
+                Resource: arn:aws:s3:::*/*
               - Effect: Allow
                 Action:
                   - logs:CreateLogStream
