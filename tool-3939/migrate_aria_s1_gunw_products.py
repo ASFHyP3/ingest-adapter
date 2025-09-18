@@ -58,7 +58,7 @@ def generate_ingest_message(product_name: str, product_files: dict) -> ingest_me
 
 def chunks(lst: list, n: int) -> Iterator[list]:
     for i in range(0, len(lst), n):
-        print(i)
+        print(i + 10)
         yield lst[i : i + n]
 
 
@@ -70,9 +70,12 @@ def main() -> None:
         products = json.load(f)
 
     for chunk in chunks(list(products.items()), 10):
-        messages = [generate_ingest_message(product_name, product_files) for product_name, product_files in chunk]
+        messages = [
+            {'Id': product_name, 'MessageBody': json.dumps(generate_ingest_message(product_name, product_files))}
+            for product_name, product_files in chunk
+        ]
         # for message in messages:
-        #     print(message['identifier'])
+        #     print(message)
         sqs.send_message_batch(QueueUrl=queue_url, Entries=messages)
 
 
