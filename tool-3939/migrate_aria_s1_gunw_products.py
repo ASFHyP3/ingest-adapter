@@ -1,8 +1,10 @@
 import json
 import os
+from collections.abc import Iterator
 from pathlib import Path
 
-import aws
+import boto3
+
 import ingest_message
 import util
 
@@ -24,7 +26,7 @@ def get_product_file(filename: str, file_info: dict) -> ingest_message.IngestPro
     return {
         'name': filename,
         'type': file_type,
-        'uri': f's3://{bucket}/{filename}',
+        'uri': f's3://jth-grfn-dev/{filename}',
         'size': size,
         'checksum': checksum,
         'checksumType': 'md5',
@@ -54,16 +56,24 @@ def generate_ingest_message(product_name: str, product_files: dict) -> ingest_me
     }
 
 
+def chunks(lst: list, n: int) -> Iterator[list]:
+    for i in range(0, len(lst), n):
+        print(i)
+        yield lst[i : i + n]
+
+
 def main() -> None:
+    sqs = boto3.client('sqs')
     queue_url = os.environ['GUNW_QUEUE_URL']
 
     with Path('aria_s1_gunw_files.json').open() as f:
         products = json.load(f)
 
-    for product_name, product_files in list(products.items())[:3]:  # TODO remove subscript
-        message = generate_ingest_message(product_name, product_files)
-        print(json.dumps(message, indent=2))
-        aws.send_ingest_message(queue_url, message)
+    for chunk in chunks(list(products.items()), 10):
+        messages = [generate_ingest_message(product_name, product_files) for product_name, product_files in chunk]
+        # for message in messages:
+        #     print(message['identifier'])
+        sqs.send_message_batch(QueueUrl=queue_url, Entries=messages)
 
 
 if __name__ == '__main__':
