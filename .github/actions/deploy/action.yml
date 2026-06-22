@@ -31,10 +31,10 @@ runs:
   using: composite
   steps:
 
-    - uses: aws-actions/configure-aws-credentials@v4
+    - uses: aws-actions/configure-aws-credentials@v6
       with:
         aws-region: us-west-2
-        aws-role-arn: ${{ secrets.AWS_ROLE_ARN }}
+        role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
 
     - uses: actions/setup-python@v5
       with:
