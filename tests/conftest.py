@@ -6,13 +6,6 @@ from moto import mock_aws
 from moto.core import patch_client
 
 
-def pytest_configure(config):
-    """Mocked AWS Credentials for moto."""
-    os.environ['AWS_ROLE_ARN'] = 'testing'
-    os.environ['AWS_DEFAULT_REGION'] = 'us-west-2'
-    os.environ['AWS_REGION'] = 'us-west-2'
-
-
 @pytest.fixture
 def gunw_data_path():
     return pathlib.Path(__file__).parent / 'data' / 'output_files' / 'gunw'
