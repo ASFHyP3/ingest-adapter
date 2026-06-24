@@ -34,7 +34,7 @@ runs:
     - uses: aws-actions/configure-aws-credentials@v6
       with:
         aws-region: us-west-2
-        role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+        role-to-assume: ${{ inputs.AWS_ROLE_ARN }}
 
     - uses: actions/setup-python@v5
       with:
