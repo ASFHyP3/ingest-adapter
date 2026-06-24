@@ -1,9 +1,9 @@
 -r app/requirements.txt
 -r plugin/requirements.txt
-mypy==1.17.1
-ruff==0.12.12
-pytest==8.4.2
+mypy==1.18.2
+ruff==0.14.6
+pytest==9.0.1
 responses==0.25.8
-moto[s3]==5.1.12
-setuptools-scm==9.2.0
-cfn-lint==1.39.1
+moto[s3]==5.1.17
+setuptools-scm==9.2.2
+cfn-lint==1.41.0
