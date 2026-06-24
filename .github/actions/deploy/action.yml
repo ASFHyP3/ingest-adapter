@@ -27,6 +27,10 @@ inputs:
   SUBNET_IDS:
     required: true
 
+permissions:
+  contents: read
+  id-token: write
+
 runs:
   using: composite
   steps:
