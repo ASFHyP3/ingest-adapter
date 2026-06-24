@@ -18,7 +18,7 @@ jobs:
       - uses: actions/checkout@v6
       - uses: ./.github/actions/deploy
         with:
-          AWS_ROLE_ARN: ${{ secrets.AWN_ROLE_ARN }}
+          AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN }}
           EARTHDATA_USERNAME: ${{ secrets.EARTHDATA_USERNAME }}
           EARTHDATA_PASSWORD: ${{ secrets.EARTHDATA_PASSWORD }}
           OPERA_RTC_QUEUE_URL: ${{ secrets.OPERA_RTC_QUEUE_URL }}
