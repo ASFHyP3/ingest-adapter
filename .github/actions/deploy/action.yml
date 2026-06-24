@@ -2,9 +2,7 @@ name: Deploy to AWS
 description: Deploys the ingest adapter app
 
 inputs:
-  AWS_ACCESS_KEY_ID:
-    required: true
-  AWS_SECRET_ACCESS_KEY:
+  AWS_ROLE_ARN:
     required: true
   TEMPLATE_BUCKET:
     required: true
@@ -33,11 +31,10 @@ runs:
   using: composite
   steps:
 
-    - uses: aws-actions/configure-aws-credentials@v4
+    - uses: aws-actions/configure-aws-credentials@v6
       with:
-        aws-access-key-id: ${{ inputs.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ inputs.AWS_SECRET_ACCESS_KEY }}
         aws-region: us-west-2
+        role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
 
     - uses: actions/setup-python@v5
       with:
