@@ -19,7 +19,7 @@ jobs:
       name: test
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: ./.github/actions/deploy
         with:
           AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN }}
