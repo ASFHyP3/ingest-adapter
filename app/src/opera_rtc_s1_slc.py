@@ -11,7 +11,7 @@ def _granule_ur_pattern(granule_ur: str) -> str:
 
 
 def _get_file_type(key: str) -> str:
-    if key.endswith('.tif') or key.endswith('.h5'):
+    if key.endswith(('.tif', '.h5')):
         return 'data'
     elif key.endswith('.png'):
         return 'browse'

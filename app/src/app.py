@@ -49,7 +49,7 @@ def lambda_handler(event: dict, _) -> dict:
             body = json.loads(record['body'])
             message = json.loads(body['Message'])
             process_message(message, credentials)
-        except Exception:
+        except Exception:  #noqa: BLE001
             print(traceback.format_exc())
             print(f'Could not process message {record["messageId"]}')
             batch_item_failures.append({'itemIdentifier': record['messageId']})
